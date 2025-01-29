@@ -55,10 +55,40 @@ p {
     padding: 20px;
 }
 
+.hide {
+    display: none;
+}
+
+.viewer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.84);
+    display: grid;
+}
+
+.viewer img {
+    margin: 0 auto;
+    width: 75%;
+    height: 75%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.viewer button {
+    color: white;
+    text-align: right;
+    margin-right: 40px;
+}
+
 
 @media screen and (min-width: 700px) {
     .gallery {
         display: grid;
+        justify-self: center;
+        max-width: 700px;
         grid-template-columns: 1fr 1fr;
     }
 }
@@ -71,7 +101,7 @@ p {
         grid-template-columns: 1fr 1fr 1fr;
     }
 
-    button {
+    .button {
         display: none;
     }
 
