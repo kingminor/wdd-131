@@ -1,12 +1,11 @@
 let button = document.getElementById("menuButton");
 let navMenu = document.getElementById("nav-menu");
-let close_viewer = document.getElementById("close-viewer")
+let gallery = document.getElementById("gallery");
 let isCollapsed = false;
-let viewer = document.getElementById("viewer")
-viewer.classList.add("hide");
 CollapseMenu(); //Hides menu by default
 
 button.addEventListener('click', CollapseMenu);
+gallery.addEventListener('click', viewHandler);
 window.addEventListener('resize', HandleResize);
 
 
@@ -37,12 +36,20 @@ function viewHandler(event) {
 
 	// get the src attribute from that element and 'split' it on the "-"
     let src = clickedObject.src;
-    
-	// construct the new image file name by adding "-full.jpeg" to the first part of the array from the previous step
+    let srcArray = src.split("-");
 
+	// construct the new image file name by adding "-full.jpeg" to the first part of the array from the previous step
+    let newimage = srcArray[0] + "-full.jpeg"
 
 	// insert the viewerTemplate into the top of the body element
-	// (element.insertAdjacentHTML("afterbegin", htmltoinsert))
+    let element = document.getElementById("body");
+    element.insertAdjacentHTML("afterbegin", `
+        <div id="viewer">
+            <button id="close-viewer">X</button>
+            <img src="norris-full.jpeg" alt="alt description">
+        </div>
+    `);
+
 
 	// add a listener to the close button (X) that calls a function called closeViewer when clicked
 
