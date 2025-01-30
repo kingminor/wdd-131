@@ -59,28 +59,36 @@ p {
     display: none;
 }
 
-.viewer {
+#viewer {
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     background-color: rgba(0, 0, 0, 0.84);
-    display: grid;
+    place-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
 }
 
-.viewer img {
+#viewer img {
+    display: block;
     margin: 0 auto;
-    width: 75%;
-    height: 75%;
-    max-width: 100%;
-    max-height: 100%;
+    object-fit: cover;
+    max-width: 80%;
+    max-height: 80%;
+    width: auto;
+    height: auto;
 }
 
-.viewer button {
+#viewer button {
+    display: block;
     color: white;
     text-align: right;
-    margin-right: 40px;
+    align-self: flex-end; /* Align button to the right */
+    margin-right: 20px; /* Adjust spacing from the right edge */
 }
 
 

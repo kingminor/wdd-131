@@ -50,7 +50,13 @@ function viewHandler(event) {
         </div>
     `);
 
-
 	// add a listener to the close button (X) that calls a function called closeViewer when clicked
+    let closeButton = document.getElementById("close-viewer");
+    closeButton.addEventListener("click", closeViewer)
 
+}
+
+function closeViewer() {
+    let viewer = document.getElementById("viewer");
+    viewer.remove();
 }
