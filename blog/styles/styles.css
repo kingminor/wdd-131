@@ -24,8 +24,14 @@ nav {
 
 nav a {
     padding-left: 10px;
+    text-decoration: underline;
     font-size: large;
     color: #55251D;
+    cursor: pointer;
+}
+
+.skiptocontent {
+    display: none;
 }
 
 p {
@@ -50,6 +56,11 @@ main {
 
 .right-side {
     border-left: solid 0.15em #B18A4B;
+    padding: 5%;
+}
+
+.book-img {
+    width: 50%;
 }
 
 .summary-text {
