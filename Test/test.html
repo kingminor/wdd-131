@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Chess</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Circular Chess</h1>
+    <canvas id="chessBoard" width="750" height="750"></canvas>
+
+    <script>
+        const canvas = document.getElementById("chessBoard");
+        const ctx = canvas.getContext("2d");
+
+        // Define board dimensions
+        const BOARD_RADIUS = 300;  // Outer radius of the board
+        const CENTER_RADIUS = 75;  // Radius of the black center (no-go zone)
+        const RANKS = 2;  // Number of circular rings (ranks)
+        const FILES = 12; // Number of sections (files)
+
+        // Define teams and piece colors
+        const TEAM_COLORS = {
+            "R": { fill: "red", text: "white" },  // Red team
+            "B": { fill: "blue", text: "white" }  // Blue team
+        };
+
+        // Create a 2D array to represent the board with pieces (null = empty space)
+        let board = [
+            ["B", null, null, null, "B", null, null, null, "B", null, null, null], // Outer ring (Blue)
+            ["R", null, null, null, "R", null, null, null, "R", null, null, null]  // Inner ring (Red)
+        ];
+
+        // Convert rank and file into x, y coordinates for drawing
+        function polarToCartesian(rank, file) {
+            let ringSpacing = BOARD_RADIUS / (RANKS + 1); // Distance between rings
+            let r = (rank + 1) * ringSpacing; // Place pieces in the middle of each ring
+            let theta = ((file + 0.5) / FILES) * 2 * Math.PI; // Offset to center piece between lines
+
+            let x = canvas.width / 2 + r * Math.cos(theta); // X coordinate
+            let y = canvas.height / 2 + r * Math.sin(theta); // Y coordinate
+
+            return { x, y };
+        }
+
+        // Draw the chessboard
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas before redrawing
+
+            // Draw center black circle (No-go zone)
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, CENTER_RADIUS, 0, 2 * Math.PI);
+            ctx.fillStyle = "black";
+            ctx.fill();
+
+            // Draw concentric rings
+            for (let i = 1; i <= RANKS; i++) {
+                let radius = (i / (RANKS + 1)) * BOARD_RADIUS + BOARD_RADIUS / (2 * (RANKS + 1));
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            // Draw radial lines (splitting into 12 sections)
+            for (let i = 0; i < FILES; i++) {
+                let theta = (i / FILES) * 2 * Math.PI; // Angle for each section
+                let x = canvas.width / 2 + BOARD_RADIUS * Math.cos(theta);
+                let y = canvas.height / 2 + BOARD_RADIUS * Math.sin(theta);
+
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+        }
+
+        // Function to draw a piece at a specific position with team colors
+        function drawPiece(rank, file, team) {
+            let { x, y } = polarToCartesian(rank, file); // Convert to Cartesian coordinates
+            let color = TEAM_COLORS[team]; // Get team colors
+
+            // Draw piece as a circle
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, 2 * Math.PI); // Circle radius = 25
+            ctx.fillStyle = color.fill; // Fill color based on team
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw label inside the piece
+            ctx.fillStyle = color.text; // Text color for contrast
+            ctx.font = "20px Arial"; // Font size
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(team, x, y); // Draw piece label
+        }
+
+        // Render board and pieces
+        drawBoard();
+        for (let rank = 0; rank < RANKS; rank++) {
+            for (let file = 0; file < FILES; file++) {
+                if (board[rank][file] !== null) {
+                    drawPiece(rank, file, board[rank][file]);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
