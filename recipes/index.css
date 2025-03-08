@@ -117,5 +117,12 @@ footer {
     .footer {
         display: flex;
         flex-direction: row-reverse;
+        justify-content: space-between;
+        width: 100%;
+
+        a{
+            margin: 0;
+            padding-left: 10px;
+        }
     }
 }
