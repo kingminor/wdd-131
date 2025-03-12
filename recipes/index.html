@@ -16,31 +16,33 @@
     </header>
     <main>
         <form id="search-recipe" action="#">
-            <input type="search" placeholder="Find a recipe">
+            <input id="search-input" type="search" placeholder="Find a recipe">
             <button type="button"><img src="images/search.svg" class="search-image"></button>
         </form>
-        <article id ="recipe-article" class="recipe-article">
-            <img class="recipe-image" src="images/apple-crisp.jpg" alt="An apple crisp with ice cream.">
-            <span>
-                <div class="tag-holder">
-                    <p class="tag">desert</p>
-                    <p class="tag">Tag2</p>
-                </div>
-                <h2 class="recipe-name">Apple Crisp</h2>
-                <span
-                    class="rating"
-                    role="img"
-                    aria-label="Rating: 4 out of 5 stars"
-                >
-                    <span aria-hidden="true" class="icon-star">⭐</span>
-                    <span aria-hidden="true" class="icon-star">⭐</span>
-                    <span aria-hidden="true" class="icon-star">⭐</span>
-                    <span aria-hidden="true" class="icon-star-empty">⭐</span>
-                    <span aria-hidden="true" class="icon-star-empty">☆</span>
+        <div id ="recipe-article">
+            <article class="recipe-article">
+                <img class="recipe-image" src="images/apple-crisp.jpg" alt="An apple crisp with ice cream.">
+                <span>
+                    <div class="tag-holder">
+                        <p class="tag">desert</p>
+                        <p class="tag">Tag2</p>
+                    </div>
+                    <h2 class="recipe-name">Apple Crisp</h2>
+                    <span
+                        class="rating"
+                        role="img"
+                        aria-label="Rating: 4 out of 5 stars"
+                    >
+                        <span aria-hidden="true" class="icon-star">⭐</span>
+                        <span aria-hidden="true" class="icon-star">⭐</span>
+                        <span aria-hidden="true" class="icon-star">⭐</span>
+                        <span aria-hidden="true" class="icon-star-empty">⭐</span>
+                        <span aria-hidden="true" class="icon-star-empty">☆</span>
+                    </span>
+                    <p class="recipe-description">This apple crisp recipe is a simple yet delicious fall dessert that's great served warm with vanilla ice cream.</p>
                 </span>
-                <p class="recipe-description">This apple crisp recipe is a simple yet delicious fall dessert that's great served warm with vanilla ice cream.</p>
-            </span>
-        </article>
+            </article>
+        </div>
     </main>
     <footer class="footer">
         <div class="social">

@@ -11,14 +11,15 @@ function GetRandomFromList(list) {
 }
 
 function RecipeTemplate(recipe) {
-    return `
+    return `<article class="recipe-article">
             <img class="recipe-image" src="${recipe.image}" alt="An apple crisp with ice cream.">
             <span>
                 ${TagTemplate(recipe.tags)}
                 <h2 class="recipe-name">${recipe.name}</h2>
                 ${ratingTemplate(recipe.rating)}
                 <p class="recipe-description">${recipe.description}</p>
-            </span>`
+            </span>
+            </article>`
 }
 
 function TagTemplate(tags) {
@@ -58,7 +59,7 @@ function ratingTemplate(rating) {
 	return html
 }
 
-function renderRecipes(recipeList) {
+function renderRecipe(recipeList) {
 	// get the element we will output the recipes into
     let recipeArticle = document.getElementById("recipe-article");
 
@@ -74,6 +75,32 @@ function init() {
     // get a random recipe
     const recipe = GetRandomFromList(recipes)
     // render the recipe with renderRecipes.
-    renderRecipes([recipe]);
+    renderRecipe([recipe]);
   }
   init();
+
+const form = document.getElementById("search-recipe");
+const searchInput = document.getElementById("search-input");
+
+function FilterRecipes(list, query) {
+    query = query.toLowerCase(); // Convert the query to lowercase for case-insensitive search
+
+    let filteredList = list.filter(recipe => 
+        recipe.name.toLowerCase().includes(query) || // Check if the name contains the query
+        recipe.tags.some(tag => tag.toLowerCase().includes(query)) // Check if any tag contains the query
+    );
+
+    filteredList.sort((a, b) => a.name.localeCompare(b.name));
+    return filteredList; // Return the filtered recipes
+}
+
+
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevents page reload
+    let recipeArticle = document.getElementById("recipe-article");
+    let query = searchInput.value;
+    let newRecipeList = FilterRecipes(recipes, query);
+    let html = newRecipeList.map(RecipeTemplate).join('');
+    recipeArticle.innerHTML = html;
+});
