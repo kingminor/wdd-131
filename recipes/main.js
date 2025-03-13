@@ -81,6 +81,7 @@ function init() {
 
 const form = document.getElementById("search-recipe");
 const searchInput = document.getElementById("search-input");
+const button = document.getElementById("search-button")
 
 function FilterRecipes(list, query) {
     query = query.toLowerCase(); // Convert the query to lowercase for case-insensitive search
@@ -96,11 +97,13 @@ function FilterRecipes(list, query) {
 
 
 
-form.addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevents page reload
+form.addEventListener("submit", searchForRecipe);
+button.addEventListener("click", searchForRecipe)
+
+function searchForRecipe(){
     let recipeArticle = document.getElementById("recipe-article");
     let query = searchInput.value;
     let newRecipeList = FilterRecipes(recipes, query);
     let html = newRecipeList.map(RecipeTemplate).join('');
     recipeArticle.innerHTML = html;
-});
+}
