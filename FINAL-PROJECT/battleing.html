@@ -5,7 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>battling</title>
     <script src="scripts/battle-system.js" type="module"></script>
+    <link rel="stylesheet" href="styles/battleing.css">
 </head>
 <body id="body">
+    <div id="wrapper">
+        <div id="background">
+            <div class="background-content">
+                <img id="opponent-pokemon-sprite" src="images/poke/lucario/lucario.gif">
+                <img id="your-pokemon-sprite" src="images/poke/umbreon/umbreon-back.gif">
+            </div>
+        </div>
+        <div id="ui-holder">
+            <div id="opponents-pokemon-info">
+                <h1 id="opponents-pokemon-name-tag">Opponents Pokemon</h1>
+                <progress id="opponents-health" value="30" max="100"></progress>
+            </div>
+            <div id="your-pokemon-info">
+                <progress id="your-health" value="100" max="150"></progress>
+                <h1 id="your-pokemon-name-tag">Your Pokemon</h1>
+            </div>
+            <div id="actions">
+                <button>Attack</button>
+                <button>Bag</button>
+                <button>Pokemon</button>
+                <button>Run</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

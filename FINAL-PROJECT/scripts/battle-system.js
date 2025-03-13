@@ -2,6 +2,13 @@ import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
 import { getTypeEffectiveness } from "./typeChart.mjs"
 
+const yourHealthBar = document.getElementById("your-health");
+const opponentsHealthBar = document.getElementById("opponents-health");
+const yourPokemonsNameTag = document.getElementById("your-pokemon-name-tag");
+const opponentsPokemonNameTag = document.getElementById("opponents-pokemon-name-tag");
+const yourPokemonSprite = document.getElementById("your-pokemon-sprite");
+const opponentsPokemonSprite = document.getElementById("opponent-pokemon-sprite");
+
 function calculateHealth(inputPokemon) {
     let EV = 510;
     let IV = 31;
@@ -26,7 +33,8 @@ function getPokemonByName(name) {
     newPokemon.health = calculateHealth(newPokemon);
     return newPokemon;
 }
-
+let yourActivePokemon = null;
+let opponentsActivePokemon = null;
 
 function getMoveByName(name) {
     return movesList.find(move => move.name === name) || null;
@@ -80,8 +88,29 @@ function attackPokemon(attackingPokemon, defendingPokemon, move) {
     defendingPokemon.health = Math.max(defendingPokemon.health, 0);
 }
 
-let myActivePokemon = getPokemonByName("Umbreon");
-let myOpponentsActivePokemon = getPokemonByName("Espeon");
-console.log(myOpponentsActivePokemon);
-attackPokemon(myActivePokemon, myOpponentsActivePokemon, getMoveByName("Dark Pulse"));
-console.log(myOpponentsActivePokemon);
+function UpdateHealthBar() {
+    //Updates Stat UI
+    yourHealthBar.value = yourActivePokemon.health;
+    opponentsHealthBar.value = opponentsActivePokemon.health;
+}
+
+function init(yourPokemon, opponentsPokemon) {
+    /*Initialize pokemon*/
+    yourActivePokemon = getPokemonByName(yourPokemon);
+    opponentsActivePokemon = getPokemonByName(opponentsPokemon);
+
+    //Initializes Health Bars
+    yourHealthBar.max = yourActivePokemon.maxHealth;
+    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
+    UpdateHealthBar();
+
+    //Updates Names Tags
+    yourPokemonsNameTag.textContent = yourActivePokemon.name;
+    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+
+    //Updates Sprites
+    yourPokemonSprite.src = yourActivePokemon.backSprite;
+    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
+}
+
+init("Umbreon", "Lucario");
