@@ -12,15 +12,10 @@ const opponentsPokemonSprite = document.getElementById("opponent-pokemon-sprite"
 function calculateHealth(inputPokemon) {
     let EV = 510;
     let IV = 31;
-    // Make sure EV is capped at 252 per stat and 510 total
-    //EV = Math.min(EV, 252);  // Cap individual stat EVs
-    // EVs are capped at 510 total, but for simplicity, we assume EV is total here.
-    //EV = Math.min(EV, 510);  // Cap total EVs
 
-    // Calculate HP
     let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
-
-    return hp;
+    
+    return Math.round(hp); // Ensure health is an integer
 }
 
 function getPokemonByName(name) {
@@ -40,6 +35,20 @@ function getMoveByName(name) {
     return movesList.find(move => move.name === name) || null;
 }
 
+function AddMovesToPokemon(pokemon, move1, move2, move3, move4) {
+    pokemon.move1 = JSON.parse(JSON.stringify(getMoveByName(move1)));
+    pokemon.move1.maxpp = pokemon.move1.pp;
+
+    pokemon.move2 = JSON.parse(JSON.stringify(getMoveByName(move2)));
+    pokemon.move2.maxpp = pokemon.move2.pp;
+
+    pokemon.move3 = JSON.parse(JSON.stringify(getMoveByName(move3)));
+    pokemon.move3.maxpp = pokemon.move3.pp;
+
+    pokemon.move4 = JSON.parse(JSON.stringify(getMoveByName(move4)));
+    pokemon.move4.maxpp = pokemon.move4.pp;
+}
+
 function getSTAB(inputType, typeArray) {
     inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
     return typeArray.some(item => item.toLowerCase() === inputType);
@@ -57,35 +66,47 @@ function calculateDamage(attackingPokemon, defendingPokemon, move) {
     }
 
     let modifier = 1;
-
-    let attackType = move.type.toLowerCase(); // Ensure move type is lowercase
+    let attackType = move.type.toLowerCase();
     let defendingTypes = Array.isArray(defendingPokemon.type) 
         ? defendingPokemon.type.map(type => type.toLowerCase()) 
-        : [defendingPokemon.type.toLowerCase()]; // Normalize to array and lowercase
+        : [defendingPokemon.type.toLowerCase()];
 
     let effectiveness = getTypeEffectiveness(attackType, defendingTypes);
 
-    if (getSTAB(attackType, attackingPokemon.type)){
-        modifier = modifier * 1.5;
+    if (getSTAB(attackType, attackingPokemon.type)) {
+        modifier *= 1.5;
     }
 
     let damage = 0;
 
-    if(move.category.toLowerCase() === 'Physical'.toLowerCase()){
+    if (move.category.toLowerCase() === 'physical') {
         damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.attack / defendingPokemon.defense)) / 50 + 2) * (effectiveness * modifier);
-    }
-    else {
+    } else {
         damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.spattack / defendingPokemon.spdef)) / 50 + 2) * (effectiveness * modifier);
     }
 
-    
-    return damage;
+    return Math.round(damage); // Ensure damage is an integer
 }
 
 function attackPokemon(attackingPokemon, defendingPokemon, move) {
     let damageDealt = calculateDamage(attackingPokemon, defendingPokemon, move);
     defendingPokemon.health -= damageDealt;
     defendingPokemon.health = Math.max(defendingPokemon.health, 0);
+}
+
+function HealPokemon (pokemon, amount) { //Amount is a float that represents a percentage of a pokemons max health (0.5 is most common)
+    let amountHealed = 0;
+    if(pokemon.health + amount > pokemon.maxHealth) {
+        amountHealed = (pokemon.maxHealth - pokemon.health);
+        pokemon.health = maxHealth;
+
+    }
+    else {
+        amountHealed = (pokemon.maxHealth * amount);
+        pokemon.health += (pokemon.maxHealth * amount);
+    }
+
+    console.log(`${pokemon.name} healed ${amountHealed} hp`);
 }
 
 function UpdateHealthBar() {
@@ -114,46 +135,69 @@ function init(yourPokemon, opponentsPokemon) {
 }
 
 function processTurn(yourMove, opponentsMove) {
+    function ExecuteMove(user, target, move) {
+        if(move.category.toLowerCase() === "physical"|| move.category.toLowerCase() === "special"){
+            let damageDealt = calculateDamage(user, target, move);
+            console.log(`${user.name} used ${move.name} and dealt ${damageDealt.toFixed(2)} damage!`);
+            attackPokemon(user, target, move);
+        }
+        else if(move.category.toLowerCase() === "healing"){
+            HealPokemon(user, move.healPercentage);
+        }
+
+        move.pp -= 1;
+    }
+
     if (yourMove.priority > opponentsMove.priority) {
-        attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
-        if(opponentsActivePokemon.health > 0) {
-            attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+
+        if (opponentsActivePokemon.health > 0) {
+            ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
         }
     }
-    else if(opponentsMove.priority > yourMove.priority){
-        attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-        if(yourActivePokemon.health > 0) {
-            attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+    else if (opponentsMove.priority > yourMove.priority) {
+        ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+
+        if (yourActivePokemon.health > 0) {
+            ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
         }
     }
     else {
-        if(yourActivePokemon.speed >= opponentsActivePokemon.speed){
-            attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
-            if(opponentsActivePokemon.health > 0) {
-                attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
+            ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+
+            if (opponentsActivePokemon.health > 0) {
+                ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
             }
         }
         else {
-            attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            if(yourActivePokemon.health > 0) {
-                attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+            ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+
+            if (yourActivePokemon.health > 0) {
+                ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
             }
         }
     }
 
     UpdateHealthBar();
 
-
-    if(yourActivePokemon.health <= 0 ) {
-        console.log("your pokemon fainted");
+    if (yourActivePokemon.health <= 0) {
+        console.log(`${yourActivePokemon.name} fainted!`);
     }
-    
-    if(opponentsActivePokemon.health <=0){
-        console.log("opponents pokemon fainted")
+
+    if (opponentsActivePokemon.health <= 0) {
+        console.log(`${opponentsActivePokemon.name} fainted!`);
     }
 }
 
 
 init("Umbreon", "Espeon");
 
-processTurn(getMoveByName("Dark Pulse"), getMoveByName("Psychic"));
+AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Assurance");
+console.log(yourActivePokemon);
+
+processTurn(yourActivePokemon.move1, getMoveByName("Psychic"));
+processTurn(yourActivePokemon.move2, getMoveByName("Moonlight"));
+processTurn(yourActivePokemon.move4, getMoveByName("Psychic"));
+
+console.log(yourActivePokemon);
