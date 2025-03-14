@@ -113,4 +113,47 @@ function init(yourPokemon, opponentsPokemon) {
     opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
 }
 
-init("Umbreon", "Lucario");
+function processTurn(yourMove, opponentsMove) {
+    if (yourMove.priority > opponentsMove.priority) {
+        attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+        if(opponentsActivePokemon.health > 0) {
+            attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        }
+    }
+    else if(opponentsMove.priority > yourMove.priority){
+        attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        if(yourActivePokemon.health > 0) {
+            attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+        }
+    }
+    else {
+        if(yourActivePokemon.speed >= opponentsActivePokemon.speed){
+            attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+            if(opponentsActivePokemon.health > 0) {
+                attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+            }
+        }
+        else {
+            attackPokemon(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+            if(yourActivePokemon.health > 0) {
+                attackPokemon(yourActivePokemon, opponentsActivePokemon, yourMove);
+            }
+        }
+    }
+
+    UpdateHealthBar();
+
+
+    if(yourActivePokemon.health <= 0 ) {
+        console.log("your pokemon fainted");
+    }
+    
+    if(opponentsActivePokemon.health <=0){
+        console.log("opponents pokemon fainted")
+    }
+}
+
+
+init("Umbreon", "Espeon");
+
+processTurn(getMoveByName("Dark Pulse"), getMoveByName("Psychic"));

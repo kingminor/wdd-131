@@ -4,6 +4,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: flex-start; 
+    background-color: #0f0f0f;
 }
 
 img {
@@ -79,4 +80,10 @@ img {
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
+    button {
+        height: 10%;
+        width: 30%;
+        text-align: left;
+        margin-top: 1%;
+    }
 }
