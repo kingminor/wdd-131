@@ -74,8 +74,10 @@ img {
     justify-content: flex-end;
 }
 
-#actions {
+.action-move-buttons {
     padding: 3%;
+    grid-column: 2/3;
+    grid-row: 2/3;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -86,4 +88,12 @@ img {
         text-align: left;
         margin-top: 1%;
     }
+}
+
+@media (max-width: calc(4 / 3 * 100vh)) {
+    #background, #ui-holder {
+        width: 100vw;
+        height: calc(100vw * 3 / 4);
+        
+    }   
 }

@@ -9,6 +9,20 @@ const opponentsPokemonNameTag = document.getElementById("opponents-pokemon-name-
 const yourPokemonSprite = document.getElementById("your-pokemon-sprite");
 const opponentsPokemonSprite = document.getElementById("opponent-pokemon-sprite");
 
+//Other 
+let yourActivePokemon = null;
+let opponentsActivePokemon = null;
+
+//Variables to HANDLE USER INPUT AND ACTIONS
+const actionHolder = document.getElementById("actions");
+const attackButton = document.getElementById("attack-button");
+
+const moveHolder = document.getElementById("moves");
+const move1Button = document.getElementById("move1");
+const move2Button = document.getElementById("move2");
+const move3Button = document.getElementById("move3");
+const move4Button = document.getElementById("move4");
+
 function calculateHealth(inputPokemon) {
     let EV = 510;
     let IV = 31;
@@ -28,8 +42,6 @@ function getPokemonByName(name) {
     newPokemon.health = calculateHealth(newPokemon);
     return newPokemon;
 }
-let yourActivePokemon = null;
-let opponentsActivePokemon = null;
 
 function getMoveByName(name) {
     return movesList.find(move => move.name === name) || null;
@@ -115,26 +127,43 @@ function UpdateHealthBar() {
     opponentsHealthBar.value = opponentsActivePokemon.health;
 }
 
-function init(yourPokemon, opponentsPokemon) {
-    /*Initialize pokemon*/
-    yourActivePokemon = getPokemonByName(yourPokemon);
-    opponentsActivePokemon = getPokemonByName(opponentsPokemon);
+function GetEnemyMove() {
 
-    //Initializes Health Bars
-    yourHealthBar.max = yourActivePokemon.maxHealth;
-    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
-    UpdateHealthBar();
+    const availableMoves = [opponentsActivePokemon.move1, opponentsActivePokemon.move2, opponentsActivePokemon.move3, opponentsActivePokemon.move4];
+    let bestMove = null;
+    let highestDamage = 0;
 
-    //Updates Names Tags
-    yourPokemonsNameTag.textContent = yourActivePokemon.name;
-    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+    // Will heal if health is less than 90% and healing move is available
+    if (opponentsActivePokemon.health < opponentsActivePokemon.maxHealth * 0.3) {
+        console.log("attempting to heal");
+        for (let move of availableMoves) {
+            if (move.category === "healing") {
+                console.log("Found Healing Move");
+                bestMove = move;  // Assign healing move to bestMove
+                break;  // Exit the loop once a healing move is found
+            }
+        }
+    }
 
-    //Updates Sprites
-    yourPokemonSprite.src = yourActivePokemon.backSprite;
-    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
+    // If no healing move was selected, choose the best move based on damage
+    if (!bestMove) { // Only proceed to damage-based selection if no healing move was found
+        availableMoves.forEach(move => {
+            const damage = calculateDamage(opponentsActivePokemon, yourActivePokemon, move);
+            if (damage >= highestDamage) {
+                bestMove = move;
+                highestDamage = damage;
+            }
+        });
+    }
+
+    return bestMove;
 }
 
-function processTurn(yourMove, opponentsMove) {
+
+function processTurn(yourMove) {
+
+    let opponentsMove = GetEnemyMove();
+
     function ExecuteMove(user, target, move) {
         if(move.category.toLowerCase() === "physical"|| move.category.toLowerCase() === "special"){
             let damageDealt = calculateDamage(user, target, move);
@@ -188,16 +217,63 @@ function processTurn(yourMove, opponentsMove) {
     if (opponentsActivePokemon.health <= 0) {
         console.log(`${opponentsActivePokemon.name} fainted!`);
     }
+
+    moveHolder.style.display = "none";
+    actionHolder.style.display = "flex";
 }
 
+function init(yourPokemon, opponentsPokemon) {
+    /*Initialize pokemon*/
+    yourActivePokemon = getPokemonByName(yourPokemon);
+    opponentsActivePokemon = getPokemonByName(opponentsPokemon);
 
-init("Lucario", "Houndoom");
+    //Initializes Health Bars
+    yourHealthBar.max = yourActivePokemon.maxHealth;
+    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
+    UpdateHealthBar();
+
+    //Updates Names Tags
+    yourPokemonsNameTag.textContent = yourActivePokemon.name;
+    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+
+    //Updates Sprites
+    yourPokemonSprite.src = yourActivePokemon.backSprite;
+    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
+
+    //Updates move holder ui
+    moveHolder.style.display = "none";
+}
+
+init("Umbreon", "Espeon");
 
 AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Assurance");
-console.log(yourActivePokemon);
+AddMovesToPokemon(opponentsActivePokemon, "Psychic", "Psychic", "Moonlight", "Psychic");
 
-processTurn(yourActivePokemon.move1, getMoveByName("Psychic"));
-processTurn(yourActivePokemon.move2, getMoveByName("Moonlight"));
-processTurn(yourActivePokemon.move4, getMoveByName("Psychic"));
+function InitMoveUI() {
+    move1Button.innerText = yourActivePokemon.move1.name;
+    move2Button.innerText = yourActivePokemon.move2.name;
+    move3Button.innerText = yourActivePokemon.move3.name;
+    move4Button.innerText = yourActivePokemon.move4.name;
+}
+InitMoveUI();
 
-console.log(yourActivePokemon);
+attackButton.addEventListener("click", function() {
+    moveHolder.style.display = "flex";
+    actionHolder.style.display = "None"
+});
+
+move1Button.addEventListener("click", function() {
+    processTurn(yourActivePokemon.move1, opponentsActivePokemon.move1);
+});
+
+move2Button.addEventListener("click", function() {
+    processTurn(yourActivePokemon.move2, opponentsActivePokemon.move1);
+});
+
+move3Button.addEventListener("click", function() {
+    processTurn(yourActivePokemon.move3, opponentsActivePokemon.move1);
+});
+
+move4Button.addEventListener("click", function() {
+    processTurn(yourActivePokemon.move4, opponentsActivePokemon.move1);
+});
