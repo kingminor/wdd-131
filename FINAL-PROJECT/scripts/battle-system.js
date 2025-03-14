@@ -191,7 +191,7 @@ function processTurn(yourMove, opponentsMove) {
 }
 
 
-init("Umbreon", "Espeon");
+init("Lucario", "Houndoom");
 
 AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Assurance");
 console.log(yourActivePokemon);
