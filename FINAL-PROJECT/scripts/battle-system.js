@@ -23,13 +23,12 @@ const move2Button = document.getElementById("move2");
 const move3Button = document.getElementById("move3");
 const move4Button = document.getElementById("move4");
 
-function calculateHealth(inputPokemon) {
-    let EV = 510;
-    let IV = 31;
+//variables to handle dialog box
+const dialogBox = document.getElementById("dialog-box");
+const dialogBoxTest = document.getElementById("dialog-box-text")
 
-    let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
-    
-    return Math.round(hp); // Ensure health is an integer
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function getPokemonByName(name) {
@@ -100,6 +99,15 @@ function calculateDamage(attackingPokemon, defendingPokemon, move) {
     return Math.round(damage); // Ensure damage is an integer
 }
 
+function calculateHealth(inputPokemon) {
+    let EV = 510;
+    let IV = 31;
+
+    let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
+    
+    return Math.round(hp); // Ensure health is an integer
+}
+
 function attackPokemon(attackingPokemon, defendingPokemon, move) {
     let damageDealt = calculateDamage(attackingPokemon, defendingPokemon, move);
     defendingPokemon.health -= damageDealt;
@@ -110,7 +118,7 @@ function HealPokemon (pokemon, amount) { //Amount is a float that represents a p
     let amountHealed = 0;
     if(pokemon.health + amount > pokemon.maxHealth) {
         amountHealed = (pokemon.maxHealth - pokemon.health);
-        pokemon.health = maxHealth;
+        pokemon.health = pokemon.maxHealth;
 
     }
     else {
@@ -128,25 +136,33 @@ function UpdateHealthBar() {
 }
 
 function GetEnemyMove() {
+    let availableMoves = [
+        opponentsActivePokemon.move1,
+        opponentsActivePokemon.move2,
+        opponentsActivePokemon.move3,
+        opponentsActivePokemon.move4
+    ].filter(move => move.pp > 0); // Exclude moves with 0 or less PP
 
-    const availableMoves = [opponentsActivePokemon.move1, opponentsActivePokemon.move2, opponentsActivePokemon.move3, opponentsActivePokemon.move4];
     let bestMove = null;
     let highestDamage = 0;
 
-    // Will heal if health is less than 90% and healing move is available
+    // If there are no valid moves left, return null
+    if (availableMoves.length === 0) {
+        return null;
+    }
+
+    // Will heal if health is less than 30% and a healing move is available
     if (opponentsActivePokemon.health < opponentsActivePokemon.maxHealth * 0.3) {
-        console.log("attempting to heal");
         for (let move of availableMoves) {
             if (move.category === "healing") {
-                console.log("Found Healing Move");
-                bestMove = move;  // Assign healing move to bestMove
-                break;  // Exit the loop once a healing move is found
+                bestMove = move; // Assign healing move to bestMove
+                break; // Exit loop once a healing move is found
             }
         }
     }
 
     // If no healing move was selected, choose the best move based on damage
-    if (!bestMove) { // Only proceed to damage-based selection if no healing move was found
+    if (!bestMove) {
         availableMoves.forEach(move => {
             const damage = calculateDamage(opponentsActivePokemon, yourActivePokemon, move);
             if (damage >= highestDamage) {
@@ -160,66 +176,86 @@ function GetEnemyMove() {
 }
 
 
-function processTurn(yourMove) {
+
+async function processTurn(yourMove) {
+
+    dialogBox.style.display = "flex";
+    moves.style.display = "none";
 
     let opponentsMove = GetEnemyMove();
 
     function ExecuteMove(user, target, move) {
-        if(move.category.toLowerCase() === "physical"|| move.category.toLowerCase() === "special"){
-            let damageDealt = calculateDamage(user, target, move);
-            console.log(`${user.name} used ${move.name} and dealt ${damageDealt.toFixed(2)} damage!`);
-            attackPokemon(user, target, move);
+        if (move.pp <= 0) {
+            dialogBoxTest.innerText = `${user.name} tried to use ${move.name}, but it has no PP left!`;
+            return;
         }
-        else if(move.category.toLowerCase() === "healing"){
+    
+        dialogBoxTest.innerText = `${user.name} used ${move.name}`;
+    
+        if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
+            attackPokemon(user, target, move);
+        } else if (move.category.toLowerCase() === "healing") {
             HealPokemon(user, move.healPercentage);
         }
-
+    
         move.pp -= 1;
     }
+    
 
     if (yourMove.priority > opponentsMove.priority) {
         ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-
+        await delay(1000);
         if (opponentsActivePokemon.health > 0) {
             ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+            await delay(1000);
         }
     }
     else if (opponentsMove.priority > yourMove.priority) {
         ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-
+        await delay(1000);
         if (yourActivePokemon.health > 0) {
             ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+            await delay(1000);
         }
     }
     else {
         if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
             ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-
+            await delay(1000);
             if (opponentsActivePokemon.health > 0) {
                 ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+                await delay(1000);
             }
         }
         else {
             ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-
+            await delay(1000);
             if (yourActivePokemon.health > 0) {
                 ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+                await delay(1000);
             }
         }
     }
 
     UpdateHealthBar();
 
+    //did you get knocked out
     if (yourActivePokemon.health <= 0) {
         console.log(`${yourActivePokemon.name} fainted!`);
+        dialogBox.innerText = `${yourActivePokemon.name} fainted!`
+        await delay(1000);
     }
 
+    //did your opponent get knocked out
     if (opponentsActivePokemon.health <= 0) {
         console.log(`${opponentsActivePokemon.name} fainted!`);
+        dialogBoxTest.innerText = `${opponentsActivePokemon.name} fainted!`
+        await delay(1000);
     }
 
     moveHolder.style.display = "none";
     actionHolder.style.display = "flex";
+    dialogBox.style.display = "none";
 }
 
 function init(yourPokemon, opponentsPokemon) {
@@ -242,6 +278,7 @@ function init(yourPokemon, opponentsPokemon) {
 
     //Updates move holder ui
     moveHolder.style.display = "none";
+    dialogBox.style.display = "none";
 }
 
 init("Umbreon", "Espeon");
@@ -263,17 +300,17 @@ attackButton.addEventListener("click", function() {
 });
 
 move1Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move1, opponentsActivePokemon.move1);
+    processTurn(yourActivePokemon.move1);
 });
 
 move2Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move2, opponentsActivePokemon.move1);
+    processTurn(yourActivePokemon.move2);
 });
 
 move3Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move3, opponentsActivePokemon.move1);
+    processTurn(yourActivePokemon.move3);
 });
 
 move4Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move4, opponentsActivePokemon.move1);
+    processTurn(yourActivePokemon.move4);
 });

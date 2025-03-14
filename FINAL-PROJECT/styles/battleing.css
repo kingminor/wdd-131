@@ -84,9 +84,30 @@ img {
     align-items: flex-end;
     button {
         height: 10%;
-        width: 30%;
+        width: 40%;
         text-align: left;
         margin-top: 1%;
+    }
+}
+
+#dialog-box {
+    grid-column: 2/3;
+    grid-row: 2/3;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 3%;
+
+    #dialog-box-background{
+        background-color: rgba(0, 0, 0, 0.7);
+        width: 100%;
+        height: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        p{
+            color: white;
+        }
     }
 }
 
