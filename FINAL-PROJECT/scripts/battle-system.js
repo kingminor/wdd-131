@@ -31,6 +31,27 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function typeText(text) {
+    return new Promise((resolve) => {
+        let index = 0;
+        dialogBoxTest.textContent = ""; // Clear previous text
+
+        function typeNextChar() {
+            if (index < text.length) {
+                dialogBoxTest.textContent += text[index];
+                index++;
+                setTimeout(typeNextChar, 30); // Adjust typing speed here
+            } else {
+                resolve(); // Resolve the promise when typing is complete
+            }
+        }
+
+        typeNextChar();
+    });
+}
+
+
+
 function getPokemonByName(name) {
     const pokemon = Pokemon.find(pokemon => pokemon.name.toLowerCase() === name.toLowerCase());
     if (!pokemon) return null; // Avoid modifying a null object
@@ -116,7 +137,7 @@ function attackPokemon(attackingPokemon, defendingPokemon, move) {
 
 function HealPokemon (pokemon, amount) { //Amount is a float that represents a percentage of a pokemons max health (0.5 is most common)
     let amountHealed = 0;
-    if(pokemon.health + amount > pokemon.maxHealth) {
+    if(pokemon.health + (pokemon.maxHealth * amount) > pokemon.maxHealth) {
         amountHealed = (pokemon.maxHealth - pokemon.health);
         pokemon.health = pokemon.maxHealth;
 
@@ -129,10 +150,30 @@ function HealPokemon (pokemon, amount) { //Amount is a float that represents a p
     console.log(`${pokemon.name} healed ${amountHealed} hp`);
 }
 
-function UpdateHealthBar() {
+function DrainPokemon(user, target, move) {
+    let drainAmount = calculateDamage(user, target, move);
+    attackPokemon(user, target, move);
+    let amount = move.healPercentage;
+
+    let amountHealed = 0;
+    if(user.health + (drainAmount * amount) > user.maxHealth) {
+        amountHealed = (user.maxHealth - user.health);
+        user.health = user.maxHealth;
+
+    }
+    else {
+        amountHealed = (drainAmount * amount);
+        user.health += (drainAmount * amount);
+    }
+
+    console.log(`${user.name} healed ${amountHealed} hp`);
+}
+
+function UpdateHealthBar() {  
     //Updates Stat UI
     yourHealthBar.value = yourActivePokemon.health;
     opponentsHealthBar.value = opponentsActivePokemon.health;
+
 }
 
 function GetEnemyMove() {
@@ -175,88 +216,102 @@ function GetEnemyMove() {
     return bestMove;
 }
 
-
-
 async function processTurn(yourMove) {
-
     dialogBox.style.display = "flex";
     moves.style.display = "none";
 
     let opponentsMove = GetEnemyMove();
 
-    function ExecuteMove(user, target, move) {
+    async function ExecuteMove(user, target, move) {
         if (move.pp <= 0) {
-            dialogBoxTest.innerText = `${user.name} tried to use ${move.name}, but it has no PP left!`;
+            await typeText(`${user.name} tried to use ${move.name}, but it failed!`);
             return;
         }
-    
-        dialogBoxTest.innerText = `${user.name} used ${move.name}`;
-    
-        if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
-            attackPokemon(user, target, move);
-        } else if (move.category.toLowerCase() === "healing") {
-            HealPokemon(user, move.healPercentage);
+
+        await typeText(`${user.name} used ${move.name}`);
+        if(move.specialBehavior != null){
+            if(move.specialBehavior.toLowerCase() === "drain"){
+                console.log("detected Drain Move")
+                DrainPokemon(user, target, move)
+            } 
         }
-    
+        else {
+            if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
+                attackPokemon(user, target, move);
+            } 
+            else if (move.category.toLowerCase() === "healing") {
+                HealPokemon(user, move.healPercentage);
+            }
+            //Add status effects here
+        }
+
         move.pp -= 1;
     }
-    
 
     if (yourMove.priority > opponentsMove.priority) {
-        ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-        await delay(1000);
+        await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+        await delay(1500);
+        await UpdateHealthBar();
         if (opponentsActivePokemon.health > 0) {
-            ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await delay(1000);
+            await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+            await delay(1500);
+            await UpdateHealthBar();
         }
     }
     else if (opponentsMove.priority > yourMove.priority) {
-        ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-        await delay(1000);
+        await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        await delay(1500);
+        await UpdateHealthBar();
         if (yourActivePokemon.health > 0) {
-            ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await delay(1000);
+            await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+            await delay(1500);
+            await UpdateHealthBar();
         }
     }
     else {
         if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
-            ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await delay(1000);
+            await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+            await delay(1500);
+            await UpdateHealthBar();
             if (opponentsActivePokemon.health > 0) {
-                ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-                await delay(1000);
+                await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+                await delay(1500);
+                await UpdateHealthBar();
             }
         }
         else {
-            ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await delay(1000);
+            await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+            await delay(1500);
+            await UpdateHealthBar();
             if (yourActivePokemon.health > 0) {
-                ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-                await delay(1000);
+                await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+                await delay(1500);
+                await UpdateHealthBar();
             }
         }
     }
 
-    UpdateHealthBar();
+    await UpdateHealthBar();
 
-    //did you get knocked out
     if (yourActivePokemon.health <= 0) {
         console.log(`${yourActivePokemon.name} fainted!`);
-        dialogBox.innerText = `${yourActivePokemon.name} fainted!`
-        await delay(1000);
+        await typeText(`${yourActivePokemon.name} fainted!`);
+        yourPokemonSprite.classList.add("faint");
+        await delay(1500);
     }
 
-    //did your opponent get knocked out
     if (opponentsActivePokemon.health <= 0) {
         console.log(`${opponentsActivePokemon.name} fainted!`);
-        dialogBoxTest.innerText = `${opponentsActivePokemon.name} fainted!`
-        await delay(1000);
+        await typeText(`${opponentsActivePokemon.name} fainted!`);
+        opponentsPokemonSprite.classList.add("faint");
+        await delay(1500);
     }
 
     moveHolder.style.display = "none";
     actionHolder.style.display = "flex";
     dialogBox.style.display = "none";
 }
+
 
 function init(yourPokemon, opponentsPokemon) {
     /*Initialize pokemon*/
@@ -283,14 +338,14 @@ function init(yourPokemon, opponentsPokemon) {
 
 init("Umbreon", "Espeon");
 
-AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Assurance");
-AddMovesToPokemon(opponentsActivePokemon, "Psychic", "Psychic", "Moonlight", "Psychic");
+AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Giga Drain");
+AddMovesToPokemon(opponentsActivePokemon, "Tackle", "Psychic", "Moonlight", "Aura Sphere");
 
 function InitMoveUI() {
-    move1Button.innerText = yourActivePokemon.move1.name;
-    move2Button.innerText = yourActivePokemon.move2.name;
-    move3Button.innerText = yourActivePokemon.move3.name;
-    move4Button.innerText = yourActivePokemon.move4.name;
+    move1Button.innerText = `${yourActivePokemon.move1.name}`;
+    move2Button.innerText = `${yourActivePokemon.move2.name}`;
+    move3Button.innerText = `${yourActivePokemon.move3.name}`;
+    move4Button.innerText = `${yourActivePokemon.move4.name}`;
 }
 InitMoveUI();
 

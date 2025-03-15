@@ -90,6 +90,18 @@ const movesList = [
       description: "The user prepares to strike the target with a powerful psychic attack in two turns."
     },
     {
+      name: "Giga Drain",
+      type: "Grass",
+      category: "Special",
+      specialBehavior: "Drain",
+      power: 75,
+      healPercentage: 0.5,
+      accuracy: 100,
+      pp: 10,
+      priority: 0,
+      description: "A nutrient-draining attack. The user's HP is restored by half the damage taken by the target."
+    },
+    {
       name: "Ice Beam",
       type: "Ice",
       category: "Special",

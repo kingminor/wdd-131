@@ -19,9 +19,8 @@ const typeChart = {
     fairy: { fighting: 2, poison: 0.5, steel: 0.5, dark: 2, dragon: 2 }
 };
 
-
 function getTypeEffectiveness(attackType, defenseTypes) {
-    if (!attackType || !defenseTypes) {
+    if (!attackType || !defenseTypes || defenseTypes.length === 0) {
         console.error(`Invalid type input: ${attackType}, ${defenseTypes}`);
         return 1; // Default to neutral effectiveness
     }
@@ -39,12 +38,12 @@ function getTypeEffectiveness(attackType, defenseTypes) {
         if (typeChart[attackTypeLower] && typeChart[attackTypeLower][typeLower] !== undefined) {
             effectiveness *= typeChart[attackTypeLower][typeLower];
         } else {
-            console.warn(`Effectiveness check failed for ${attackType} vs ${type}`);
+            effectiveness *= 1; // Default to neutral effectiveness instead of a warning
         }
     }
 
+    //console.log(`Effectiveness ${effectiveness}, ${attackType} vs ${defenseTypes}!`)
     return effectiveness;
 }
-
 
 export { getTypeEffectiveness };
