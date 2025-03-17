@@ -60,6 +60,7 @@ function getPokemonByName(name) {
     newPokemon.level = 50;
     newPokemon.maxHealth = calculateHealth(newPokemon);
     newPokemon.health = newPokemon.maxHealth;
+    newPokemon.status = null;
     return newPokemon;
 }
 
@@ -292,6 +293,36 @@ async function processTurn(yourMove) {
     }
 
     await UpdateHealthBar();
+
+    //add damage checkup phase. for status effects.
+    async function pokemonCheckup(pokemon) {
+        if(pokemon.status != null) {
+            //Check for poison 
+            if(pokemon.status.toLowerCase() === "psn"){
+                pokemon.health = Math.max(0, pokemon.health - (pokemon.maxHealth * (1 / 8)));
+                await typeText(`${pokemon.name} took damage from poison!`);
+                await delay(1500);
+            }
+            else if(pokemon.status.toLowerCase() === "tox"){
+                if(pokemon.turnsSinceTox == null){
+                    pokemon.turnsSinceTox = 1;
+                }
+                else {
+                    pokemon.turnsSinceTox += 1;
+                }
+
+                pokemon.health = Math.max(0, pokemon.health - ((pokemon.maxHealth * (1 / 16)) * turnsSinceTox));
+                await typeText(`${pokemon.name} took damage from its toxic poison!`);
+            }
+            else if(pokemon.status.toLowerCase() === "brn") {
+                pokemon.health = Math.max(0, pokemon.health - (pokemon.maxHealth * (1 / 16)));
+                await typeText(`${pokemon.name} took damage from it's burn!`);
+            }
+        }
+    }
+
+    await pokemonCheckup(yourActivePokemon);
+    await pokemonCheckup(opponentsActivePokemon);
 
     if (yourActivePokemon.health <= 0) {
         console.log(`${yourActivePokemon.name} fainted!`);
