@@ -26,6 +26,7 @@ const move4Button = document.getElementById("move4");
 //variables to handle dialog box
 const dialogBox = document.getElementById("dialog-box");
 const dialogBoxTest = document.getElementById("dialog-box-text")
+const delayAmount = 1500;
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -217,6 +218,10 @@ function GetEnemyMove() {
     return bestMove;
 }
 
+function doesHit(chance) {
+    return Math.random() * 100 < chance;
+}
+
 async function processTurn(yourMove) {
     dialogBox.style.display = "flex";
     moves.style.display = "none";
@@ -232,9 +237,20 @@ async function processTurn(yourMove) {
         await typeText(`${user.name} used ${move.name}`);
         if(move.specialBehavior != null){
             if(move.specialBehavior.toLowerCase() === "drain"){
-                console.log("detected Drain Move")
-                DrainPokemon(user, target, move)
+                DrainPokemon(user, target, move);
             } 
+            else if (move.specialBehavior.toLowerCase() === "dmg-psn") {
+                attackPokemon(user, target, move);
+                if(doesHit(move.statusAccuracy)){
+                    target.status = "psn";
+                }
+            }
+            else if (move.specialBehavior.toLowerCase() === "dmg-tox") {
+                attackPokemon(user, target, move);
+                if(doesHit(move.statusAccuracy)){
+                    target.status = "tox";
+                }
+            }
         }
         else {
             if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
@@ -299,7 +315,8 @@ async function processTurn(yourMove) {
         if(pokemon.status != null) {
             //Check for poison 
             if(pokemon.status.toLowerCase() === "psn"){
-                pokemon.health = Math.max(0, pokemon.health - (pokemon.maxHealth * (1 / 8)));
+                pokemon.health -= (pokemon.maxHealth * (1 / 8));
+                pokemon.health = Math.max(pokemon.health, 0);
                 await typeText(`${pokemon.name} took damage from poison!`);
                 await delay(1500);
             }
@@ -311,12 +328,16 @@ async function processTurn(yourMove) {
                     pokemon.turnsSinceTox += 1;
                 }
 
-                pokemon.health = Math.max(0, pokemon.health - ((pokemon.maxHealth * (1 / 16)) * turnsSinceTox));
+                pokemon.health -= (pokemon.maxHealth * ((1 / 16) * pokemon.turnsSinceTox));
+                pokemon.health = Math.max(pokemon.health, 0);
                 await typeText(`${pokemon.name} took damage from its toxic poison!`);
+                await delay(1500);
             }
             else if(pokemon.status.toLowerCase() === "brn") {
-                pokemon.health = Math.max(0, pokemon.health - (pokemon.maxHealth * (1 / 16)));
+                pokemon.health -= (pokemon.maxHealth * (1 / 16));
+                pokemon.health = Math.max(pokemon.health, 0);
                 await typeText(`${pokemon.name} took damage from it's burn!`);
+                await delay(1500);
             }
         }
     }
@@ -370,7 +391,7 @@ function init(yourPokemon, opponentsPokemon) {
 init("Umbreon", "Espeon");
 
 AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Giga Drain");
-AddMovesToPokemon(opponentsActivePokemon, "Tackle", "Psychic", "Moonlight", "Aura Sphere");
+AddMovesToPokemon(opponentsActivePokemon, "Tackle", "Psychic", "Moonlight", "Toxic Surge");
 
 function InitMoveUI() {
     move1Button.innerText = `${yourActivePokemon.move1.name}`;

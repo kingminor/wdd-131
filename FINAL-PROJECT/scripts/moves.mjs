@@ -232,6 +232,19 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Toxic Surge",
+    type: "Poison",
+    category: "Special",
+    specialBehavior: "dmg-tox",
+    statusAccuracy: 30,
+    power: 80,
+    accuracy: 100,
+    pp: 10,
+    priority: 0,
+    description: "The user releases a violent surge of toxic energy, dealing damage and having a 30% chance to badly poison the target.",
+    critChance: 0.0625
+  },
+  {
     name: "Tackle",
     type: "Normal",
     category: "Physical",
