@@ -138,6 +138,7 @@ const movesList = [
     type: "Fairy",
     category: "healing",
     healPercentage: 0.5,
+    accuracy: 100,
     pp: 5,
     priority: 0,
     description: "The user restores its HP. The amount of HP restored varies depending on the weather.",
