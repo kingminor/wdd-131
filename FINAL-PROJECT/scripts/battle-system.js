@@ -26,7 +26,7 @@ const move4Button = document.getElementById("move4");
 //variables to handle dialog box
 const dialogBox = document.getElementById("dialog-box");
 const dialogBoxTest = document.getElementById("dialog-box-text")
-const delayAmount = 1500;
+const delayAmount = 1200;
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -51,7 +51,18 @@ async function typeText(text) {
     });
 }
 
+function determineGender(pokemon) {
+    // Generate a random number between 0 and 1
+    let random = Math.random();
 
+    if (pokemon.genderRatio == null){
+        return null;
+    } else if (random < pokemon.genderRatio) {
+        return "Male";
+    } else {
+        return "Female";
+    }
+}
 
 function getPokemonByName(name) {
     const pokemon = Pokemon.find(pokemon => pokemon.name.toLowerCase() === name.toLowerCase());
@@ -62,6 +73,8 @@ function getPokemonByName(name) {
     newPokemon.maxHealth = calculateHealth(newPokemon);
     newPokemon.health = newPokemon.maxHealth;
     newPokemon.status = null;
+    newPokemon.gender = determineGender(newPokemon);
+    newPokemon.evasion = 1;
     return newPokemon;
 }
 
@@ -218,8 +231,94 @@ function GetEnemyMove() {
     return bestMove;
 }
 
-function doesHit(chance) {
-    return Math.random() * 100 < chance;
+function doesSucceed(chance) {
+    if(chance == null) {
+        return true;
+    }
+    else {
+        return Math.random() * 100 < chance;
+    }
+}
+
+function doesHitWithStats(user, target, move){ //TEMPORARY LOGIC, UPDATE NEEDED FOR BETTER GAMEPLAY
+    //TEMP
+    return doesSucceed(move.accuracy);
+}
+
+async function doesHitAdvanced(user, target, move) {
+    if(user.status != null){
+        if (user.status.toLowerCase() === "par"){
+            if(doesHit(25)){
+                await typeText(`${user.name} failed to move because of paralysis!`);
+                await delay(delayAmount);
+                return false;
+            }
+            else {
+                return doesHitWithStats(user, target, move);
+            }
+        }
+        else if(user.status.toLowerCase() === "frz"){
+            if(doesSucceed(20)){ //20% chance to thaw
+                user.status = null;
+                await typeText(`${user.name} thawed out!`);
+                await delay(delayAmount);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is frozen and cannot move!`);
+                await delay(delayAmount);
+                return false;
+            }
+        }
+        else if(user.status.toLowerCase() === "slp"){
+            if(doesSucceed(1/3)){
+                user.status = null;
+                await typeText(`${user.name} woke up!`);
+                await delay(delayAmount);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is asleep. It cannot move!`);
+                return false;
+            }
+        }
+        else if(user.status.toLowerCase() === "con") {
+            if(doesSucceed(25)){
+                user.status = null;
+                await typeText(`${user.name} snapped out of it's confusion`);
+                await delay(1500);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                if(doesSucceed(1/3)){
+                    let damage = (2 * user.level / 5 + 2) * 40 * user.attack / 50 + 2;
+                    user.health -= damage;
+                    user.health = Math.max(user.health, 0);
+                    await typeText(`${user.move} hurt itself in its confusion`);
+                    await delay(delayAmount);
+                    return false;
+                }   
+                else {
+                    return doesHitWithStats(user, target, move);
+                }
+            }
+        }
+        else if(user.status.toLowerCase() === "inf"){
+            if(doesSucceed(50)){
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is immobilized by love`);
+                await delay(delayAmount);
+                return false;
+            }
+        }
+        else{
+            return doesHitWithStats(user, target, move);
+        }
+    } else {
+        return doesHitWithStats(user, target, move);
+    }
 }
 
 async function processTurn(yourMove) {
@@ -234,21 +333,22 @@ async function processTurn(yourMove) {
             return;
         }
 
-        if(doesHit(move.accuracy)) {
+        if(await doesHitAdvanced(user, target, move)) {
             await typeText(`${user.name} used ${move.name}`);
+            await delay(delayAmount);
             if(move.specialBehavior != null){
                 if(move.specialBehavior.toLowerCase() === "drain"){
                     DrainPokemon(user, target, move);
                 } 
                 else if (move.specialBehavior.toLowerCase() === "dmg-psn") {
                     attackPokemon(user, target, move);
-                    if(doesHit(move.statusAccuracy)){
+                    if(doesSucceed(move.statusAccuracy)){
                         target.status = "psn";
                     }
                 }
                 else if (move.specialBehavior.toLowerCase() === "dmg-tox") {
                     attackPokemon(user, target, move);
-                    if(doesHit(move.statusAccuracy)){
+                    if(doesSucceed(move.statusAccuracy)){
                         target.status = "tox";
                     }
                 }
@@ -260,13 +360,34 @@ async function processTurn(yourMove) {
                 else if (move.category.toLowerCase() === "healing") {
                     HealPokemon(user, move.healPercentage);
                 }
-                //Add status effects here
+                else if(move.category.toLowerCase() === "status") {
+                    target.status = move.statusType.toLowerCase();
+                    if(move.statusType.toLowerCase() === "pzn"){
+                        await typeText(`${target.name} is now poisoned!`);
+                        await delay(delayAmount);
+                    } else if(move.statusType.toLowerCase() === "frz"){
+                        await typeText(`${target.name} is now frozen!`);
+                        await delay(delayAmount);
+                    } else if(move.statusType.toLowerCase() === "slp"){
+                        await typeText(`${target.name} is now asleep!`);
+                        await delay(delayAmount);
+                    } else if(move.statusType.toLowerCase() === "con"){
+                        await typeText(`${target.name} is now confused!`);
+                        await delay(delayAmount);
+                    } else if(move.statusType.toLowerCase() === "inf"){
+                        await typeText(`${target.name} fell in love with ${user.name}!`);
+                        await delay(delayAmount);
+                    }
+                }
             }
 
             move.pp -= 1;
         }
         else {
-            await typeText(`${user.name} tried to use ${move.name}, but it missed!`)
+            if(user.status == null){
+                await typeText(`${user.name} tried to use ${move.name}, but it missed!`);
+                await delay(delayAmount);
+            }
         }
     }
 
@@ -397,7 +518,7 @@ function init(yourPokemon, opponentsPokemon) {
 
 init("Umbreon", "Espeon");
 
-AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Giga Drain");
+AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Confuse Ray");
 AddMovesToPokemon(opponentsActivePokemon, "Tackle", "Psychic", "Moonlight", "Toxic Surge");
 
 function InitMoveUI() {

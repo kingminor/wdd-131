@@ -33,6 +33,16 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Confuse Ray",
+    type: "Ghose",
+    category: "Status",
+    statusType: "con",
+    accuracy: "100",
+    pp: 10,
+    priority:0,
+    description: "The user releases a ray of eerie light, confusing the target and making them disoriented.",
+  },
+  {
     name: "Crunch",
     type: "Dark",
     category: "Physical",
@@ -233,6 +243,17 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Toxic",
+    type: "Poison",
+    category: "Status",
+    statusType: "psn",
+    accuracy: "90",
+    pp: 10,
+    priority: 0,
+    description: "The user shoots a toxic substance at the target, badly poisoning them.",
+
+  },
+  {
     name: "Toxic Surge",
     type: "Poison",
     category: "Special",
@@ -255,6 +276,16 @@ const movesList = [
     priority: 0,
     description: "The user tackles the target with force.",
     critChance: 0.0625  // Default crit rate
+  },
+  {
+    name: "Will-O-Wisp",
+    type: "Fire",
+    category: "Status",
+    statusType: "brn",
+    accuracy: 85,
+    pp: 10,
+    priority: 0,
+    description: "The user fights with overwhelming strength, lowering the user's Defense and Special Defense.",
   },
 ];
 

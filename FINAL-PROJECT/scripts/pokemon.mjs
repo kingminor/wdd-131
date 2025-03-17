@@ -1,5 +1,5 @@
 const Pokemon = [
-    {
+  {
       name: "Eevee",
       type: ["Normal"],
       hp: 55,
@@ -11,15 +11,16 @@ const Pokemon = [
       frontSprite: "images/poke/eevee/eevee.gif",
       backSprite: "images/poke/eevee/eevee-back.gif",
       moves: [
-        "Tackle",
-        "Quick Attack",
-        "Return",
-        "Hyper Beam",
-        "Shadow Ball"
+          "Tackle",
+          "Quick Attack",
+          "Return",
+          "Hyper Beam",
+          "Shadow Ball"
       ],
-      pokedexNumber: 133
-    },
-    {
+      pokedexNumber: 133,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
       name: "Espeon",
       type: ["Psychic"],
       hp: 65,
@@ -31,15 +32,16 @@ const Pokemon = [
       frontSprite: "images/poke/espeon/espeon.gif",
       backSprite: "images/poke/espeon/espeon-back.gif",
       moves: [
-        "Psychic",
-        "Shadow Ball",
-        "Psybeam",
-        "Dazzling Gleam",
-        "Future Sight"
+          "Psychic",
+          "Shadow Ball",
+          "Psybeam",
+          "Dazzling Gleam",
+          "Future Sight"
       ],
-      pokedexNumber: 196
-    },
-    {
+      pokedexNumber: 196,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
       name: "Houndoom",
       type: ["Dark", "Fire"],
       hp: 75,
@@ -51,16 +53,17 @@ const Pokemon = [
       frontSprite: "images/poke/houndoom/houndoom.gif",
       backSprite: "images/poke/houndoom/houndoom-back.gif",
       moves: [
-        "Flamethrower",
-        "Crunch",
-        "Dark Pulse",
-        "Fire Blast",
-        "Bite",
-        "Sludge Bomb"
+          "Flamethrower",
+          "Crunch",
+          "Dark Pulse",
+          "Fire Blast",
+          "Bite",
+          "Sludge Bomb"
       ],
-      pokedexNumber: 229
-    },
-    {
+      pokedexNumber: 229,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
       name: "Lucario",
       type: ["Fighting", "Steel"],
       hp: 70,
@@ -72,16 +75,17 @@ const Pokemon = [
       frontSprite: "images/poke/lucario/lucario.gif",
       backSprite: "images/poke/lucario/lucario-back.gif",
       moves: [
-        "Aura Sphere",
-        "Close Combat",
-        "Iron Tail",
-        "Flash Cannon",
-        "Extreme Speed",
-        "Metal Claw"
+          "Aura Sphere",
+          "Close Combat",
+          "Iron Tail",
+          "Flash Cannon",
+          "Extreme Speed",
+          "Metal Claw"
       ],
-      pokedexNumber: 448
-    },
-    {
+      pokedexNumber: 448,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
       name: "Umbreon",
       type: ["Dark"],
       hp: 95,
@@ -93,16 +97,17 @@ const Pokemon = [
       frontSprite: "images/poke/umbreon/umbreon.gif",
       backSprite: "images/poke/umbreon/umbreon-back.gif",
       moves: [
-        "Foul Play",
-        "Dark Pulse",
-        "Payback",
-        "Confuse Ray",
-        "Toxic",
-        "Moonlight"
+          "Foul Play",
+          "Dark Pulse",
+          "Payback",
+          "Confuse Ray",
+          "Toxic",
+          "Moonlight"
       ],
-      pokedexNumber: 197
-    },
-    {
+      pokedexNumber: 197,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
       name: "Zekrom",
       type: ["Dragon", "Electric"],
       hp: 100,
@@ -114,16 +119,17 @@ const Pokemon = [
       frontSprite: "images/poke/zekrom/zekrom.gif",
       backSprite: "images/poke/zekrom/zekrom-back.gif",
       moves: [
-        "Thunderbolt",
-        "Fusion Bolt",
-        "Outrage",
-        "Dragon Claw",
-        "Volt Switch",
-        "Wild Charge"
+          "Thunderbolt",
+          "Fusion Bolt",
+          "Outrage",
+          "Dragon Claw",
+          "Volt Switch",
+          "Wild Charge"
       ],
-      pokedexNumber: 644
-    },
-    {
+      pokedexNumber: 644,
+      genderRatio: null // Genderless
+  },
+  {
       name: "Zoroark",
       type: ["Dark"],
       hp: 60,
@@ -135,16 +141,16 @@ const Pokemon = [
       frontSprite: "images/poke/zoroark/zoroark.gif",
       backSprite: "images/poke/zoroark/zoroark-back.gif",
       moves: [
-        "Night Slash",
-        "Foul Play",
-        "Shadow Ball",
-        "Flamethrower",
-        "Pursuit",
-        "Sludge Bomb"
+          "Night Slash",
+          "Foul Play",
+          "Shadow Ball",
+          "Flamethrower",
+          "Pursuit",
+          "Sludge Bomb"
       ],
-      pokedexNumber: 571
-    }
-  ]
-  
-  export default Pokemon;
-  
+      pokedexNumber: 571,
+      genderRatio: 0.875 // 87.5% male, 12.5% female
+  }
+];
+
+export default Pokemon;
