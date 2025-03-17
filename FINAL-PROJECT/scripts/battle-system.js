@@ -234,35 +234,40 @@ async function processTurn(yourMove) {
             return;
         }
 
-        await typeText(`${user.name} used ${move.name}`);
-        if(move.specialBehavior != null){
-            if(move.specialBehavior.toLowerCase() === "drain"){
-                DrainPokemon(user, target, move);
-            } 
-            else if (move.specialBehavior.toLowerCase() === "dmg-psn") {
-                attackPokemon(user, target, move);
-                if(doesHit(move.statusAccuracy)){
-                    target.status = "psn";
+        if(doesHit(move.accuracy)) {
+            await typeText(`${user.name} used ${move.name}`);
+            if(move.specialBehavior != null){
+                if(move.specialBehavior.toLowerCase() === "drain"){
+                    DrainPokemon(user, target, move);
+                } 
+                else if (move.specialBehavior.toLowerCase() === "dmg-psn") {
+                    attackPokemon(user, target, move);
+                    if(doesHit(move.statusAccuracy)){
+                        target.status = "psn";
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "dmg-tox") {
+                    attackPokemon(user, target, move);
+                    if(doesHit(move.statusAccuracy)){
+                        target.status = "tox";
+                    }
                 }
             }
-            else if (move.specialBehavior.toLowerCase() === "dmg-tox") {
-                attackPokemon(user, target, move);
-                if(doesHit(move.statusAccuracy)){
-                    target.status = "tox";
+            else {
+                if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
+                    attackPokemon(user, target, move);
+                } 
+                else if (move.category.toLowerCase() === "healing") {
+                    HealPokemon(user, move.healPercentage);
                 }
+                //Add status effects here
             }
+
+            move.pp -= 1;
         }
         else {
-            if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
-                attackPokemon(user, target, move);
-            } 
-            else if (move.category.toLowerCase() === "healing") {
-                HealPokemon(user, move.healPercentage);
-            }
-            //Add status effects here
+            await typeText(`${user.name} tried to use ${move.name}, but it missed!`)
         }
-
-        move.pp -= 1;
     }
 
     if (yourMove.priority > opponentsMove.priority) {
@@ -344,6 +349,8 @@ async function processTurn(yourMove) {
 
     await pokemonCheckup(yourActivePokemon);
     await pokemonCheckup(opponentsActivePokemon);
+
+    UpdateHealthBar();
 
     if (yourActivePokemon.health <= 0) {
         console.log(`${yourActivePokemon.name} fainted!`);
