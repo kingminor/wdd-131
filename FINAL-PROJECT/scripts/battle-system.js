@@ -59,7 +59,7 @@ function getPokemonByName(name) {
     const newPokemon = JSON.parse(JSON.stringify(pokemon));
     newPokemon.level = 50;
     newPokemon.maxHealth = calculateHealth(newPokemon);
-    newPokemon.health = calculateHealth(newPokemon);
+    newPokemon.health = newPokemon.maxHealth;
     return newPokemon;
 }
 
@@ -84,6 +84,15 @@ function AddMovesToPokemon(pokemon, move1, move2, move3, move4) {
 function getSTAB(inputType, typeArray) {
     inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
     return typeArray.some(item => item.toLowerCase() === inputType);
+}
+
+function calculateHealth(inputPokemon) {
+    let EV = 510;
+    let IV = 31;
+
+    let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
+    
+    return Math.round(hp); // Ensure health is an integer
 }
 
 function calculateDamage(attackingPokemon, defendingPokemon, move) {
@@ -118,15 +127,6 @@ function calculateDamage(attackingPokemon, defendingPokemon, move) {
     }
 
     return Math.round(damage); // Ensure damage is an integer
-}
-
-function calculateHealth(inputPokemon) {
-    let EV = 510;
-    let IV = 31;
-
-    let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
-    
-    return Math.round(hp); // Ensure health is an integer
 }
 
 function attackPokemon(attackingPokemon, defendingPokemon, move) {
