@@ -37,7 +37,7 @@ const movesList = [
     type: "Ghose",
     category: "Status",
     statusType: "con",
-    accuracy: "100",
+    accuracy: 100,
     pp: 10,
     priority:0,
     description: "The user releases a ray of eerie light, confusing the target and making them disoriented.",

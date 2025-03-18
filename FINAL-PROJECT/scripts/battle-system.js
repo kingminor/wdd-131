@@ -393,42 +393,34 @@ async function processTurn(yourMove) {
 
     if (yourMove.priority > opponentsMove.priority) {
         await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-        await delay(1500);
         await UpdateHealthBar();
         if (opponentsActivePokemon.health > 0) {
             await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await delay(1500);
             await UpdateHealthBar();
         }
     }
     else if (opponentsMove.priority > yourMove.priority) {
         await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-        await delay(1500);
         await UpdateHealthBar();
         if (yourActivePokemon.health > 0) {
             await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await delay(1500);
             await UpdateHealthBar();
         }
     }
     else {
         if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
             await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await delay(1500);
             await UpdateHealthBar();
             if (opponentsActivePokemon.health > 0) {
                 await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-                await delay(1500);
                 await UpdateHealthBar();
             }
         }
         else {
             await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await delay(1500);
             await UpdateHealthBar();
             if (yourActivePokemon.health > 0) {
                 await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-                await delay(1500);
                 await UpdateHealthBar();
             }
         }
