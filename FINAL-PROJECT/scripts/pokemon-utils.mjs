@@ -149,7 +149,7 @@ const testTeam2 = [
         gender: 1
     },
     {
-        name: "Umbreon",
+        name: "Houndoom",
         move1: "Dark Pulse",
         move2: "Crunch",
         move3: "Moonlight",
