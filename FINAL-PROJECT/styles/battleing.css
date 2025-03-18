@@ -36,6 +36,7 @@ img {
     grid-template-rows: 50% 50%;
     width: 100%;
     height: 100%;
+    overflow: hidden;
     #opponent-pokemon-sprite {
         grid-column: 2 / 3;
         grid-row: 1 / 2;
@@ -141,6 +142,28 @@ img {
 
 .faint {
     animation: faint 300ms ease-out forwards;
+}
+
+@keyframes pokemonEnterAndGlow {
+    0% {
+        transform: translateY(-100%) scale(0); /* Start off-screen and smaller */
+        opacity: 0;
+        filter: brightness(100%) drop-shadow(0 0 5px white);
+    }
+    50% {
+        transform: translateY(0) scale(1); /* Pokémon comes into view at normal size */
+        opacity: 1;
+        filter: brightness(150%) drop-shadow(0 0 20px white); /* Glowing effect */
+    }
+    100% {
+        transform: translateY(0) scale(1); /* Pokémon stays at normal size */
+        opacity: 1;
+        filter: brightness(100%) drop-shadow(0 0 5px white); /* Glow fades slightly */
+    }
+}
+
+.pokemon-enter-glow {
+    animation: pokemonEnterAndGlow 1.5s ease-in-out;
 }
 
 

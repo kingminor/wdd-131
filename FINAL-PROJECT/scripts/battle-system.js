@@ -1,6 +1,8 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
 import { getTypeEffectiveness } from "./typeChart.mjs"
+import {GenerateTeamFromPokemon, testTeam1, testTeam2 } from "./pokemon-utils.mjs";
+
 
 const yourHealthBar = document.getElementById("your-health");
 const opponentsHealthBar = document.getElementById("opponents-health");
@@ -12,6 +14,9 @@ const opponentsPokemonSprite = document.getElementById("opponent-pokemon-sprite"
 //Other 
 let yourActivePokemon = null;
 let opponentsActivePokemon = null;
+
+let yourPokemonTeam = [];
+let opponentsPokemonTeam = [];
 
 //Variables to HANDLE USER INPUT AND ACTIONS
 const actionHolder = document.getElementById("actions");
@@ -51,63 +56,9 @@ async function typeText(text) {
     });
 }
 
-function determineGender(pokemon) {
-    // Generate a random number between 0 and 1
-    let random = Math.random();
-
-    if (pokemon.genderRatio == null){
-        return null;
-    } else if (random < pokemon.genderRatio) {
-        return "Male";
-    } else {
-        return "Female";
-    }
-}
-
-function getPokemonByName(name) {
-    const pokemon = Pokemon.find(pokemon => pokemon.name.toLowerCase() === name.toLowerCase());
-    if (!pokemon) return null; // Avoid modifying a null object
-
-    const newPokemon = JSON.parse(JSON.stringify(pokemon));
-    newPokemon.level = 50;
-    newPokemon.maxHealth = calculateHealth(newPokemon);
-    newPokemon.health = newPokemon.maxHealth;
-    newPokemon.status = null;
-    newPokemon.gender = determineGender(newPokemon);
-    newPokemon.evasion = 1;
-    return newPokemon;
-}
-
-function getMoveByName(name) {
-    return movesList.find(move => move.name === name) || null;
-}
-
-function AddMovesToPokemon(pokemon, move1, move2, move3, move4) {
-    pokemon.move1 = JSON.parse(JSON.stringify(getMoveByName(move1)));
-    pokemon.move1.maxpp = pokemon.move1.pp;
-
-    pokemon.move2 = JSON.parse(JSON.stringify(getMoveByName(move2)));
-    pokemon.move2.maxpp = pokemon.move2.pp;
-
-    pokemon.move3 = JSON.parse(JSON.stringify(getMoveByName(move3)));
-    pokemon.move3.maxpp = pokemon.move3.pp;
-
-    pokemon.move4 = JSON.parse(JSON.stringify(getMoveByName(move4)));
-    pokemon.move4.maxpp = pokemon.move4.pp;
-}
-
 function getSTAB(inputType, typeArray) {
     inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
     return typeArray.some(item => item.toLowerCase() === inputType);
-}
-
-function calculateHealth(inputPokemon) {
-    let EV = 510;
-    let IV = 31;
-
-    let hp = Math.floor(((2 * inputPokemon.hp + IV + Math.floor(EV / 4)) * inputPokemon.level) / 100 + 10 + inputPokemon.level);
-    
-    return Math.round(hp); // Ensure health is an integer
 }
 
 function calculateDamage(attackingPokemon, defendingPokemon, move) {
@@ -229,6 +180,10 @@ function GetEnemyMove() {
     }
 
     return bestMove;
+}
+
+function GetEnemyNextPokemon() {
+    return opponentsPokemonTeam.find(pokemon => pokemon.health > 0);
 }
 
 function doesSucceed(chance) {
@@ -465,18 +420,25 @@ async function processTurn(yourMove) {
 
     UpdateHealthBar();
 
+    // Did your pokemon get knocked out
     if (yourActivePokemon.health <= 0) {
         console.log(`${yourActivePokemon.name} fainted!`);
         await typeText(`${yourActivePokemon.name} fainted!`);
         yourPokemonSprite.classList.add("faint");
-        await delay(1500);
+        await delay(delayAmount);
     }
 
+    //Did your oppoents pokemon get knocked out
     if (opponentsActivePokemon.health <= 0) {
         console.log(`${opponentsActivePokemon.name} fainted!`);
         await typeText(`${opponentsActivePokemon.name} fainted!`);
         opponentsPokemonSprite.classList.add("faint");
-        await delay(1500);
+        await delay(delayAmount);
+        let opponentsNextPokemon = GetEnemyNextPokemon();
+        console.log(opponentsNextPokemon);
+        if (opponentsNextPokemon != null){
+            await OpponentSwitchPokemon(opponentsNextPokemon);
+        }
     }
 
     moveHolder.style.display = "none";
@@ -485,10 +447,10 @@ async function processTurn(yourMove) {
 }
 
 
-function init(yourPokemon, opponentsPokemon) {
+function init(yourTeam, opponentsTeam) {
     /*Initialize pokemon*/
-    yourActivePokemon = getPokemonByName(yourPokemon);
-    opponentsActivePokemon = getPokemonByName(opponentsPokemon);
+    yourActivePokemon = yourTeam[0];
+    opponentsActivePokemon = opponentsTeam[0];
 
     //Initializes Health Bars
     yourHealthBar.max = yourActivePokemon.maxHealth;
@@ -508,10 +470,53 @@ function init(yourPokemon, opponentsPokemon) {
     dialogBox.style.display = "none";
 }
 
-init("Umbreon", "Espeon");
+async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a reference to either yourActivePokemon or opponentsActivePokemon
 
-AddMovesToPokemon(yourActivePokemon, "Dark Pulse", "Crunch", "Moonlight", "Confuse Ray");
-AddMovesToPokemon(opponentsActivePokemon, "Tackle", "Psychic", "Moonlight", "Toxic Surge");
+    await typeText(`Opponent sent out ${newActivePokemon.name}!`)
+    await delay(delayAmount);
+
+    opponentsActivePokemon = newActivePokemon;
+
+    //Initializes Health Bars
+    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
+    UpdateHealthBar();
+
+    //Updates Names Tags
+    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+
+    //Updates Sprites
+    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
+
+    opponentsPokemonSprite.classList.remove("faint");
+    opponentsPokemonSprite.classList.add("pokemon-enter-glow");
+}
+
+async function YouSwitchPokemon (newActivePokemon) {
+
+    await typeText(`GO ${newActivePokemon.name}! You can do it!`)
+    await delay(delayAmount);
+
+    yourActivePokemon = newActivePokemon;
+
+    yourHealthBar.max = yourActivePokemon.maxHealth;
+    UpdateHealthBar();
+
+    yourPokemonsNameTag.textContent = yourActivePokemon.name;
+
+    yourPokemonSprite.src = yourActivePokemon.backSprite;
+
+    yourPokemonSprite.classList.remove("faint");
+    yourPokemonSprite.classList.add("pokemon-enter-glow");
+}
+
+GenerateTeamFromPokemon(yourPokemonTeam, testTeam1)
+
+GenerateTeamFromPokemon(opponentsPokemonTeam, testTeam2)
+
+init(yourPokemonTeam, opponentsPokemonTeam);
+
+console.log(yourPokemonTeam);
+console.log(opponentsPokemonTeam);
 
 function InitMoveUI() {
     move1Button.innerText = `${yourActivePokemon.move1.name}`;
