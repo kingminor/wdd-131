@@ -276,6 +276,8 @@ async function doesHitAdvanced(user, target, move) {
     }
 }
 
+
+
 async function processTurn(yourMove) {
     dialogBox.style.display = "flex";
     moves.style.display = "none";
@@ -422,6 +424,7 @@ async function processTurn(yourMove) {
 
     // Did your pokemon get knocked out
     if (yourActivePokemon.health <= 0) {
+        yourPokemonSprite.classList.remove("pokemon-enter-glow");
         console.log(`${yourActivePokemon.name} fainted!`);
         await typeText(`${yourActivePokemon.name} fainted!`);
         yourPokemonSprite.classList.add("faint");
@@ -430,6 +433,7 @@ async function processTurn(yourMove) {
 
     //Did your oppoents pokemon get knocked out
     if (opponentsActivePokemon.health <= 0) {
+        opponentsPokemonSprite.classList.remove("pokemon-enter-glow");
         console.log(`${opponentsActivePokemon.name} fainted!`);
         await typeText(`${opponentsActivePokemon.name} fainted!`);
         opponentsPokemonSprite.classList.add("faint");

@@ -149,43 +149,39 @@ const testTeam2 = [
         gender: 1
     },
     {
-        name: "Houndoom",
+        name: "Eevee",
         move1: "Dark Pulse",
         move2: "Crunch",
         move3: "Moonlight",
         move4: "Confuse Ray",
-        gender: 0
     },
     {
-        name: "Zekrom",
+        name: "Jolteon",
         move1: "Tackle",
         move2: "Psychic",
         move3: "Moonlight",
         move4: "Toxic Surge",
     },
     {
-        name: "Zoroark",
+        name: "Flareon",
         move1: "Tackle",
         move2: "Psychic",
         move3: "Moonlight",
         move4: "Toxic Surge",
-        gender: 0
     },
     {
-        name: "Lucario",
+        name: "Vaporeon",
         move1: "Tackle",
         move2: "Psychic",
         move3: "Moonlight",
         move4: "Toxic Surge",
-        gender: 0
     },
     {
-        name: "Eevee",
+        name: "Glaceon",
         move1: "Tackle",
         move2: "Psychic",
         move3: "Moonlight",
         move4: "Toxic Surge",
-        gender: 0
     },
 ]
 

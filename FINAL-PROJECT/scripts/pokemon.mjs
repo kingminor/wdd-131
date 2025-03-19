@@ -42,6 +42,50 @@ const Pokemon = [
       genderRatio: 0.875 // 87.5% male, 12.5% female
   },
   {
+    name: "Flareon",
+    type: ["Fire"],
+    hp: 65,
+    attack: 130,
+    defense: 60,
+    spattack: 95,
+    spdef: 110,
+    speed: 65,
+    frontSprite: "images/poke/flareon/flareon.gif",
+    backSprite: "images/poke/flareon/flareon-back.gif",
+    moves: [
+        "Flare Blitz",
+        "Fire Fang",
+        "Quick Attack",
+        "Superpower",
+        "Will-O-Wisp",
+        "Bite"
+    ],
+    pokedexNumber: 136,
+    genderRatio: 0.875
+  },
+  {
+    name: "Glaceon",
+    type: ["Ice"],
+    hp: 65,
+    attack: 60,
+    defense: 110,
+    spattack: 130,
+    spdef: 95,
+    speed: 65,
+    frontSprite: "images/poke/glaceon/glaceon.gif",
+    backSprite: "images/poke/glaceon/glaceon-back.gif",
+    moves: [
+        "Ice Beam",
+        "Shadow Ball",
+        "Mirror Coat",
+        "Blizzard",
+        "Freeze-Dry",
+        "Hail"
+    ],
+    pokedexNumber: 471,
+    genderRatio: 0.875
+  },
+  {
       name: "Houndoom",
       type: ["Dark", "Fire"],
       hp: 75,
@@ -64,6 +108,50 @@ const Pokemon = [
       genderRatio: 0.875 // 87.5% male, 12.5% female
   },
   {
+    name: "Jolteon",
+    type: ["Electric"],
+    hp: 65,
+    attack: 65,
+    defense: 60,
+    spattack: 110,
+    spdef: 95,
+    speed: 130,
+    frontSprite: "images/poke/jolteon/jolteon.gif",
+    backSprite: "images/poke/jolteon/jolteon-back.gif",
+    moves: [
+        "Thunderbolt",
+        "Thunder Wave",
+        "Shadow Ball",
+        "Pin Missile",
+        "Volt Switch",
+        "Hidden Power Ice"
+    ],
+    pokedexNumber: 135,
+    genderRatio: 0.875
+  },
+  {
+    name: "Leafeon",
+    type: ["Grass"],
+    hp: 65,
+    attack: 110,
+    defense: 130,
+    spattack: 60,
+    spdef: 65,
+    speed: 95,
+    frontSprite: "images/poke/leafeon/leafeon.gif",
+    backSprite: "images/poke/leafeon/leafeon-back.gif",
+    moves: [
+        "Leaf Blade",
+        "Swords Dance",
+        "X-Scissor",
+        "Quick Attack",
+        "Synthesis",
+        "Knock Off"
+    ],
+    pokedexNumber: 470,
+    genderRatio: 0.875
+  },
+    {
       name: "Lucario",
       type: ["Fighting", "Steel"],
       hp: 70,
@@ -106,6 +194,28 @@ const Pokemon = [
       ],
       pokedexNumber: 197,
       genderRatio: 0.875 // 87.5% male, 12.5% female
+  },
+  {
+    name: "Vaporeon",
+    type: ["Water"],
+    hp: 130,
+    attack: 65,
+    defense: 60,
+    spattack: 110,
+    spdef: 95,
+    speed: 65,
+    frontSprite: "images/poke/vaporeon/vaporeon.gif",
+    backSprite: "images/poke/vaporeon/vaporeon-back.gif",
+    moves: [
+        "Scald",
+        "Ice Beam",
+        "Aqua Ring",
+        "Acid Armor",
+        "Hydro Pump",
+        "Wish"
+    ],
+    pokedexNumber: 134,
+    genderRatio: 0.875
   },
   {
       name: "Zekrom",
