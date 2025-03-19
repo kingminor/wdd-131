@@ -277,7 +277,7 @@ async function doesHitAdvanced(user, target, move) {
 }
 
 
-
+// MOST IMPORTANT FUNCTION
 async function processTurn(yourMove) {
     dialogBox.style.display = "flex";
     moves.style.display = "none";
@@ -449,6 +449,7 @@ async function processTurn(yourMove) {
     actionHolder.style.display = "flex";
     dialogBox.style.display = "none";
 }
+
 
 
 function init(yourTeam, opponentsTeam) {
