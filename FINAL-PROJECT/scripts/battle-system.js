@@ -2,12 +2,8 @@ import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
 import { getTypeEffectiveness, GetTypeImageSourceFromString, generateTypeIcons } from "./typeChart.mjs"
 import {GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon } from "./pokemon-utils.mjs";
+import {typeText, UpdateHealthBar, UpdateNameTags} from "./ui-utils.mjs";
 
-
-const yourHealthBar = document.getElementById("your-health");
-const opponentsHealthBar = document.getElementById("opponents-health");
-const yourPokemonsNameTag = document.getElementById("your-pokemon-name-tag");
-const opponentsPokemonNameTag = document.getElementById("opponents-pokemon-name-tag");
 const yourPokemonSprite = document.getElementById("your-pokemon-sprite");
 const opponentsPokemonSprite = document.getElementById("opponent-pokemon-sprite");
 
@@ -31,9 +27,8 @@ const move2Button = document.getElementById("move2");
 const move3Button = document.getElementById("move3");
 const move4Button = document.getElementById("move4");
 
-//variables to handle dialog box
+
 const dialogBox = document.getElementById("dialog-box");
-const dialogBoxTest = document.getElementById("dialog-box-text")
 const delayAmount = 1200;
 
 //variables to handle switching pokemon
@@ -43,32 +38,6 @@ const pokemonInfoHolder = document.getElementById("pokemon-info-holder");
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function typeText(text) {
-    return new Promise((resolve) => {
-        let index = 0;
-        dialogBoxTest.textContent = ""; // Clear previous text
-
-        function typeNextChar() {
-            if (index < text.length) {
-                dialogBoxTest.textContent += text[index];
-                index++;
-                setTimeout(typeNextChar, 30); // Adjust typing speed here
-            } else {
-                resolve(); // Resolve the promise when typing is complete
-            }
-        }
-
-        typeNextChar();
-    });
-}
-
-function UpdateHealthBar() {  
-    //Updates Stat UI
-    yourHealthBar.value = yourActivePokemon.health;
-    opponentsHealthBar.value = opponentsActivePokemon.health;
-
 }
 
 function GetEnemyMove() {
@@ -370,40 +339,40 @@ async function processTurn(yourMove) {
 
     if (yourMove.priority > opponentsMove.priority) {
         await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-        await UpdateHealthBar();
+        UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
         if (opponentsActivePokemon.health > 0) {
             await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await UpdateHealthBar();
+            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
         }
     }
     else if (opponentsMove.priority > yourMove.priority) {
         await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-        await UpdateHealthBar();
+        UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
         if (yourActivePokemon.health > 0) {
             await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await UpdateHealthBar();
+            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
         }
     }
     else {
         if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
             await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            await UpdateHealthBar();
+            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             if (opponentsActivePokemon.health > 0) {
                 await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-                await UpdateHealthBar();
+                UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             }
         }
         else {
             await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            await UpdateHealthBar();
+            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             if (yourActivePokemon.health > 0) {
                 await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-                await UpdateHealthBar();
+                UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             }
         }
     }
 
-    await UpdateHealthBar();
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
     //add damage checkup phase. for status effects.
     async function pokemonCheckup(pokemon) {
@@ -440,7 +409,7 @@ async function processTurn(yourMove) {
     await pokemonCheckup(yourActivePokemon);
     await pokemonCheckup(opponentsActivePokemon);
 
-    UpdateHealthBar();
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
     // Did your pokemon get knocked out
     if (yourActivePokemon.health <= 0) {
@@ -476,13 +445,10 @@ function init(yourTeam, opponentsTeam) {
     opponentsActivePokemon = opponentsTeam[0];
 
     //Initializes Health Bars
-    yourHealthBar.max = yourActivePokemon.maxHealth;
-    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
-    UpdateHealthBar();
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
     //Updates Names Tags
-    yourPokemonsNameTag.textContent = yourActivePokemon.name;
-    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
 
     //Updates Sprites
     yourPokemonSprite.src = yourActivePokemon.backSprite;
@@ -509,11 +475,10 @@ async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a refer
     opponentsActivePokemon = newActivePokemon;
 
     //Initializes Health Bars
-    opponentsHealthBar.max = opponentsActivePokemon.maxHealth;
-    UpdateHealthBar();
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
     //Updates Names Tags
-    opponentsPokemonNameTag.textContent = opponentsActivePokemon.name;
+    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
 
     //Updates Sprites
     opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
@@ -530,9 +495,9 @@ async function YouSwitchPokemon (newActivePokemon) {
     yourActivePokemon = newActivePokemon;
 
     yourHealthBar.max = yourActivePokemon.maxHealth;
-    UpdateHealthBar();
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
-    yourPokemonsNameTag.textContent = yourActivePokemon.name;
+    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
 
     yourPokemonSprite.src = yourActivePokemon.backSprite;
 
