@@ -21,6 +21,7 @@ let opponentsPokemonTeam = [];
 //Variables to HANDLE USER INPUT AND ACTIONS
 const actionHolder = document.getElementById("actions");
 const attackButton = document.getElementById("attack-button");
+const switchPokemonButton = document.getElementById("switch-pokemon-button");
 
 const moveHolder = document.getElementById("moves");
 const move1Button = document.getElementById("move1");
@@ -32,6 +33,10 @@ const move4Button = document.getElementById("move4");
 const dialogBox = document.getElementById("dialog-box");
 const dialogBoxTest = document.getElementById("dialog-box-text")
 const delayAmount = 1200;
+
+//variables to handle switching pokemon
+const switchPokemonScreen = document.getElementById("select-pokemon-screen");
+const teamHolder = document.getElementById("team-holder")
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -276,6 +281,32 @@ async function doesHitAdvanced(user, target, move) {
     }
 }
 
+function OpenSwitchPokemon() {
+    switchPokemonScreen.style.display = "block";
+
+    function PokemonTabTemplate(pokemon, index) {
+        let gender = "";
+
+        if (pokemon.gender !== null) {
+            if (pokemon.gender.toLowerCase() === "male") {
+                gender = "♂";
+            } else if (pokemon.gender.toLowerCase() === "female") {
+                gender = "♀";
+            }
+        }
+
+        return `<div class="pokemon-summarry" id="pokemon-${index + 1}">
+                    <img src="${pokemon.frontSprite}" alt="pokemon">
+                    <h1>${pokemon.name}</h1>
+                    <p> LV: ${pokemon.level} ${gender}</p> 
+                    <progress value="${pokemon.health}" max="${pokemon.maxHealth}"></progress>
+                </div>`;
+    }
+
+    const pokemonTabsHTML = yourPokemonTeam.map((pokemon, index) => PokemonTabTemplate(pokemon, index)).join("");
+    teamHolder.innerHTML = pokemonTabsHTML;
+}
+
 
 // MOST IMPORTANT FUNCTION
 async function processTurn(yourMove) {
@@ -450,8 +481,6 @@ async function processTurn(yourMove) {
     dialogBox.style.display = "none";
 }
 
-
-
 function init(yourTeam, opponentsTeam) {
     /*Initialize pokemon*/
     yourActivePokemon = yourTeam[0];
@@ -473,6 +502,9 @@ function init(yourTeam, opponentsTeam) {
     //Updates move holder ui
     moveHolder.style.display = "none";
     dialogBox.style.display = "none";
+
+    //Updates switch pokemon
+    switchPokemonScreen.style.display = "none";
 }
 
 async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a reference to either yourActivePokemon or opponentsActivePokemon
@@ -536,6 +568,8 @@ attackButton.addEventListener("click", function() {
     actionHolder.style.display = "None"
 });
 
+switchPokemonButton.addEventListener("click", OpenSwitchPokemon)
+
 move1Button.addEventListener("click", function() {
     processTurn(yourActivePokemon.move1);
 });
@@ -550,4 +584,12 @@ move3Button.addEventListener("click", function() {
 
 move4Button.addEventListener("click", function() {
     processTurn(yourActivePokemon.move4);
+});
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Tab") {
+        event.preventDefault(); // Prevents browser focus switching
+        console.log("Tab key pressed! Toggling menu...");
+        switchPokemonScreen.style.display = "none";
+    }
 });

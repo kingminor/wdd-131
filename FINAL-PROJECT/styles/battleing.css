@@ -137,6 +137,7 @@ img {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    display: block;
 
     #pokemon-holder{
         margin: 10%;

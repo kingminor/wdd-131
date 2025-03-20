@@ -79,11 +79,11 @@ function GenerateTeamFromPokemon(team, pokemons) {
 
         if (pokemon.gender != null && newPokemon.genderRatio != null) {
             if (pokemon.gender === 0) {
-                pokemon.gender = "Male";
+                newPokemon.gender = "Male";
             } else if (pokemon.gender === 1) {
-                pokemon.gender = "Female";
+                newPokemon.gender = "Female";
             }
-        }
+        }        
 
         team.push(newPokemon); // Add the new Pokémon to the team
     });
