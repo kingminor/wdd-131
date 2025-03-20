@@ -1,7 +1,7 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
 import { getTypeEffectiveness, GetTypeImageSourceFromString, generateTypeIcons } from "./typeChart.mjs"
-import {GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon } from "./pokemon-utils.mjs";
+import {GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced } from "./pokemon-utils.mjs";
 import {typeText, UpdateHealthBar, UpdateNameTags} from "./ui-utils.mjs";
 
 const yourPokemonSprite = document.getElementById("your-pokemon-sprite");
@@ -84,97 +84,6 @@ function GetEnemyNextPokemon() {
     return opponentsPokemonTeam.find(pokemon => pokemon.health > 0);
 }
 
-function doesSucceed(chance) {
-    if(chance == null) {
-        return true;
-    }
-    else {
-        return Math.random() * 100 < chance;
-    }
-}
-
-function doesHitWithStats(user, target, move){ //TEMPORARY LOGIC, UPDATE NEEDED FOR BETTER GAMEPLAY
-    //TEMP
-    return doesSucceed(move.accuracy);
-}
-
-async function doesHitAdvanced(user, target, move) {
-    if(user.status != null){
-        if (user.status.toLowerCase() === "par"){
-            if(doesHit(25)){
-                await typeText(`${user.name} failed to move because of paralysis!`);
-                await delay(delayAmount);
-                return false;
-            }
-            else {
-                return doesHitWithStats(user, target, move);
-            }
-        }
-        else if(user.status.toLowerCase() === "frz"){
-            if(doesSucceed(20)){ //20% chance to thaw
-                user.status = null;
-                await typeText(`${user.name} thawed out!`);
-                await delay(delayAmount);
-                return doesHitWithStats(user, target, move);
-            }
-            else {
-                await typeText(`${user.name} is frozen and cannot move!`);
-                await delay(delayAmount);
-                return false;
-            }
-        }
-        else if(user.status.toLowerCase() === "slp"){
-            if(doesSucceed(1/3)){
-                user.status = null;
-                await typeText(`${user.name} woke up!`);
-                await delay(delayAmount);
-                return doesHitWithStats(user, target, move);
-            }
-            else {
-                await typeText(`${user.name} is asleep. It cannot move!`);
-                await delay(delayAmount);
-                return false;
-            }
-        }
-        else if(user.status.toLowerCase() === "con") {
-            if(doesSucceed(25)){
-                user.status = null;
-                await typeText(`${user.name} snapped out of it's confusion`);
-                await delay(1500);
-                return doesHitWithStats(user, target, move);
-            }
-            else {
-                if(doesSucceed(1/3)){
-                    let damage = (2 * user.level / 5 + 2) * 40 * user.attack / 50 + 2;
-                    user.health -= damage;
-                    user.health = Math.max(user.health, 0);
-                    await typeText(`${user.move} hurt itself in its confusion`);
-                    await delay(delayAmount);
-                    return false;
-                }   
-                else {
-                    return doesHitWithStats(user, target, move);
-                }
-            }
-        }
-        else if(user.status.toLowerCase() === "inf"){
-            if(doesSucceed(50)){
-                return doesHitWithStats(user, target, move);
-            }
-            else {
-                await typeText(`${user.name} is immobilized by love`);
-                await delay(delayAmount);
-                return false;
-            }
-        }
-        else{
-            return doesHitWithStats(user, target, move);
-        }
-    } else {
-        return doesHitWithStats(user, target, move);
-    }
-}
-
 function OpenSwitchPokemon() {
     switchPokemonScreen.style.display = "block";
 
@@ -254,9 +163,14 @@ function OpenSwitchPokemon() {
         pokemonElement.addEventListener("click", (event) => {
             let index = event.currentTarget.dataset.index;
             let selectedPokemon = yourPokemonTeam[index];
-
-            console.log(selectedPokemon);
+        
+            if (selectedPokemon.health > 0) {
+                YouSwitchPokemon(selectedPokemon);
+            } else {
+                alert(`${selectedPokemon.name} has fainted and cannot be sent out!`);
+            }
         });
+        
     });
 }
 
@@ -489,20 +403,37 @@ async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a refer
 
 async function YouSwitchPokemon (newActivePokemon) {
 
-    await typeText(`GO ${newActivePokemon.name}! You can do it!`)
+    switchPokemonScreen.style.display = "none";
+    actionHolder.style.display = "none";
+    yourPokemonSprite.classList.remove("pokemon-enter-glow");
+    dialogBox.style.display = "flex";
+    console.log("atempting to switch pokemon");
+
+    if(yourActivePokemon.health > 0){
+        await typeText(`Great job ${yourActivePokemon.name}! Return!`);
+        await delay(delayAmount);
+        yourPokemonSprite.classList.add("retreat-animation");
+        await delay(delayAmount);
+    }
+
+    await typeText(`Go, ${newActivePokemon.name}! Show them what you've got!`);
     await delay(delayAmount);
 
     yourActivePokemon = newActivePokemon;
 
-    yourHealthBar.max = yourActivePokemon.maxHealth;
     UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
 
     UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
 
     yourPokemonSprite.src = yourActivePokemon.backSprite;
 
+    yourPokemonSprite.classList.remove("retreat-animation");
     yourPokemonSprite.classList.remove("faint");
     yourPokemonSprite.classList.add("pokemon-enter-glow");
+
+    await delay(delayAmount);
+    actionHolder.style.display = "flex";
+    dialogBox.style.display = "none";
 }
 
 GenerateTeamFromPokemon(yourPokemonTeam, testTeam1)
@@ -519,7 +450,7 @@ attackButton.addEventListener("click", function() {
     actionHolder.style.display = "None"
 });
 
-switchPokemonButton.addEventListener("click", OpenSwitchPokemon)
+switchPokemonButton.addEventListener("click", OpenSwitchPokemon);
 
 move1Button.addEventListener("click", function() {
     processTurn(yourActivePokemon.move1);

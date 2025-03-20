@@ -1,5 +1,6 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
+import {typeText, UpdateHealthBar, UpdateNameTags} from "./ui-utils.mjs";
 import {getTypeEffectiveness} from "./typeChart.mjs";
 
 function calculateHealth(inputPokemon) {
@@ -265,4 +266,95 @@ function DrainPokemon(user, target, move) {
     console.log(`${user.name} healed ${amountHealed} hp`);
 }
 
-export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon };
+function doesSucceed(chance) {
+    if(chance == null) {
+        return true;
+    }
+    else {
+        return Math.random() * 100 < chance;
+    }
+}
+
+function doesHitWithStats(user, target, move){ //TEMPORARY LOGIC, UPDATE NEEDED FOR BETTER GAMEPLAY
+    //TEMP
+    return doesSucceed(move.accuracy);
+}
+
+async function doesHitAdvanced(user, target, move) {
+    if(user.status != null){
+        if (user.status.toLowerCase() === "par"){
+            if(doesHit(25)){
+                await typeText(`${user.name} failed to move because of paralysis!`);
+                await delay(delayAmount);
+                return false;
+            }
+            else {
+                return doesHitWithStats(user, target, move);
+            }
+        }
+        else if(user.status.toLowerCase() === "frz"){
+            if(doesSucceed(20)){ //20% chance to thaw
+                user.status = null;
+                await typeText(`${user.name} thawed out!`);
+                await delay(delayAmount);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is frozen and cannot move!`);
+                await delay(delayAmount);
+                return false;
+            }
+        }
+        else if(user.status.toLowerCase() === "slp"){
+            if(doesSucceed(1/3)){
+                user.status = null;
+                await typeText(`${user.name} woke up!`);
+                await delay(delayAmount);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is asleep. It cannot move!`);
+                await delay(delayAmount);
+                return false;
+            }
+        }
+        else if(user.status.toLowerCase() === "con") {
+            if(doesSucceed(25)){
+                user.status = null;
+                await typeText(`${user.name} snapped out of it's confusion`);
+                await delay(1500);
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                if(doesSucceed(1/3)){
+                    let damage = (2 * user.level / 5 + 2) * 40 * user.attack / 50 + 2;
+                    user.health -= damage;
+                    user.health = Math.max(user.health, 0);
+                    await typeText(`${user.move} hurt itself in its confusion`);
+                    await delay(delayAmount);
+                    return false;
+                }   
+                else {
+                    return doesHitWithStats(user, target, move);
+                }
+            }
+        }
+        else if(user.status.toLowerCase() === "inf"){
+            if(doesSucceed(50)){
+                return doesHitWithStats(user, target, move);
+            }
+            else {
+                await typeText(`${user.name} is immobilized by love`);
+                await delay(delayAmount);
+                return false;
+            }
+        }
+        else{
+            return doesHitWithStats(user, target, move);
+        }
+    } else {
+        return doesHitWithStats(user, target, move);
+    }
+}
+
+export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced };
