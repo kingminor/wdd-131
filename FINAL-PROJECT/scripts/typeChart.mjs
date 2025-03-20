@@ -46,4 +46,42 @@ function getTypeEffectiveness(attackType, defenseTypes) {
     return effectiveness;
 }
 
-export { getTypeEffectiveness };
+const typeIcons = {
+    bug: "images/type-icon/Pokemon_Type_Icon_Bug.svg",
+    dark: "images/type-icon/Pokemon_Type_Icon_Dark.svg",
+    dragon: "images/type-icon/Pokemon_Type_Icon_Dragon.svg",
+    electric: "images/type-icon/Pokemon_Type_Icon_Electric.svg",
+    fairy: "images/type-icon/Pokemon_Type_Icon_Fairy.svg",
+    fighting: "images/type-icon/Pokemon_Type_Icon_Fighting.svg",
+    fire: "images/type-icon/Pokemon_Type_Icon_Fire.svg",
+    flying: "images/type-icon/Pokemon_Type_Icon_Flying.svg",
+    ghost: "images/type-icon/Pokemon_Type_Icon_Ghost.svg",
+    grass: "images/type-icon/Pokemon_Type_Icon_Grass.svg",
+    ground: "images/type-icon/Pokemon_Type_Icon_Ground.svg",
+    ice: "images/type-icon/Pokemon_Type_Icon_Ice.svg",
+    normal: "images/type-icon/Pokemon_Type_Icon_Normal.svg",
+    poison: "images/type-icon/Pokemon_Type_Icon_Poison.svg",  // Fixed typo
+    psychic: "images/type-icon/Pokemon_Type_Icon_Psychic.svg",
+    rock: "images/type-icon/Pokemon_Type_Icon_Rock.svg",
+    steel: "images/type-icon/Pokemon_Type_Icon_Steel.svg",
+    water: "images/type-icon/Pokemon_Type_Icon_Water.svg",
+};
+
+function GetTypeImageSourceFromString(type) {
+    return typeIcons[type.toLowerCase()] || "images/type-icon/default.svg";  // Fallback for unknown types
+}
+
+function generateTypeIcons(types, className = "", joinChar = " ") {
+    // Ensure types is an array
+    if (typeof types === "string") {
+        types = [types]; // Convert single string to an array
+    }
+
+    return types.map(type => {
+        const imgSrc = GetTypeImageSourceFromString(type);
+        return `<img class="${className}" src="${imgSrc}" alt="${type} type icon">`;
+    }).join(joinChar); // Joins all images into a single string
+}
+
+
+export { getTypeEffectiveness, GetTypeImageSourceFromString, generateTypeIcons };

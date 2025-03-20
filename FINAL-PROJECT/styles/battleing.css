@@ -168,10 +168,55 @@ img {
                 margin: auto;
             }
         }
+
+        #hovered-pokemon-info {
+            background-color: #0f0f0f;
+            margin: 1%;
+            padding: 0 10% 0 10%;
+            color: white;
+            font-size: larger;
+            display: flex;
+            flex-direction: column;
+
+            .pokemon-info-holder-type-img{
+                height: 3vh;
+            }
+
+            .pokemon-move{
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                background-color: #000;
+                margin: 10px 0 10px 0;
+                padding: 2%;
+
+                img {
+                    height: 3vh;
+                }
+
+                p{
+                    margin: 10px;
+                }
+            }
+        }
     }
 
 }
 
+@keyframes retreat {
+    0% {
+        transform: translateX(0) scale(1); /* No movement, full size */
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-100px) scale(0.5); /* Shrinks to 50% size and moves */
+        opacity: 0;
+    }
+}
+
+.retreat-animation {
+    animation: retreat 0.5s ease-out forwards;
+}
 
 
 

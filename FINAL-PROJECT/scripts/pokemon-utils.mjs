@@ -1,5 +1,6 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
+import {getTypeEffectiveness} from "./typeChart.mjs";
 
 function calculateHealth(inputPokemon) {
     let EV = 510;
@@ -95,7 +96,7 @@ const testTeam1 = [
         move1: "Dark Pulse",
         move2: "Crunch",
         move3: "Moonlight",
-        move4: "Giga Drain",
+        move4: "Rest",
         gender: 0
     },
     {
@@ -185,4 +186,83 @@ const testTeam2 = [
     },
 ]
 
-export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2 };
+function getSTAB(inputType, typeArray) {
+    inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
+    return typeArray.some(item => item.toLowerCase() === inputType);
+}
+
+function calculateDamage(attackingPokemon, defendingPokemon, move) {
+    if (!move || !move.type) {
+        console.error("Invalid move:", move);
+        return 0;
+    }
+
+    if (!defendingPokemon || !defendingPokemon.type) {
+        console.error("Invalid defending Pokémon:", defendingPokemon);
+        return 0;
+    }
+
+    let modifier = 1;
+    let attackType = move.type.toLowerCase();
+    let defendingTypes = Array.isArray(defendingPokemon.type) 
+        ? defendingPokemon.type.map(type => type.toLowerCase()) 
+        : [defendingPokemon.type.toLowerCase()];
+
+    let effectiveness = getTypeEffectiveness(attackType, defendingTypes);
+
+    if (getSTAB(attackType, attackingPokemon.type)) {
+        modifier *= 1.5;
+    }
+
+    let damage = 0;
+
+    if (move.category.toLowerCase() === 'physical') {
+        damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.attack / defendingPokemon.defense)) / 50 + 2) * (effectiveness * modifier);
+    } else {
+        damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.spattack / defendingPokemon.spdef)) / 50 + 2) * (effectiveness * modifier);
+    }
+
+    return Math.round(damage); // Ensure damage is an integer
+}
+
+function attackPokemon(attackingPokemon, defendingPokemon, move) {
+    let damageDealt = calculateDamage(attackingPokemon, defendingPokemon, move);
+    defendingPokemon.health -= damageDealt;
+    defendingPokemon.health = Math.max(defendingPokemon.health, 0);
+}
+
+function HealPokemon (pokemon, amount) { //Amount is a float that represents a percentage of a pokemons max health (0.5 is most common)
+    let amountHealed = 0;
+    if(pokemon.health + (pokemon.maxHealth * amount) > pokemon.maxHealth) {
+        amountHealed = (pokemon.maxHealth - pokemon.health);
+        pokemon.health = pokemon.maxHealth;
+
+    }
+    else {
+        amountHealed = (pokemon.maxHealth * amount);
+        pokemon.health += (pokemon.maxHealth * amount);
+    }
+
+    console.log(`${pokemon.name} healed ${amountHealed} hp`);
+}
+
+function DrainPokemon(user, target, move) {
+    let drainAmount = calculateDamage(user, target, move);
+    attackPokemon(user, target, move);
+    let amount = move.healPercentage;
+
+    let amountHealed = 0;
+    if(user.health + (drainAmount * amount) > user.maxHealth) {
+        amountHealed = (user.maxHealth - user.health);
+        user.health = user.maxHealth;
+
+    }
+    else {
+        amountHealed = (drainAmount * amount);
+        user.health += (drainAmount * amount);
+    }
+
+    console.log(`${user.name} healed ${amountHealed} hp`);
+}
+
+export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon };

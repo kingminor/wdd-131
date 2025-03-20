@@ -1,7 +1,7 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
-import { getTypeEffectiveness } from "./typeChart.mjs"
-import {GenerateTeamFromPokemon, testTeam1, testTeam2 } from "./pokemon-utils.mjs";
+import { getTypeEffectiveness, GetTypeImageSourceFromString, generateTypeIcons } from "./typeChart.mjs"
+import {GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon } from "./pokemon-utils.mjs";
 
 
 const yourHealthBar = document.getElementById("your-health");
@@ -17,6 +17,8 @@ let opponentsActivePokemon = null;
 
 let yourPokemonTeam = [];
 let opponentsPokemonTeam = [];
+
+let blockTab = false;
 
 //Variables to HANDLE USER INPUT AND ACTIONS
 const actionHolder = document.getElementById("actions");
@@ -36,7 +38,8 @@ const delayAmount = 1200;
 
 //variables to handle switching pokemon
 const switchPokemonScreen = document.getElementById("select-pokemon-screen");
-const teamHolder = document.getElementById("team-holder")
+const teamHolder = document.getElementById("team-holder");
+const pokemonInfoHolder = document.getElementById("pokemon-info-holder");
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -59,85 +62,6 @@ async function typeText(text) {
 
         typeNextChar();
     });
-}
-
-function getSTAB(inputType, typeArray) {
-    inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
-    return typeArray.some(item => item.toLowerCase() === inputType);
-}
-
-function calculateDamage(attackingPokemon, defendingPokemon, move) {
-    if (!move || !move.type) {
-        console.error("Invalid move:", move);
-        return 0;
-    }
-
-    if (!defendingPokemon || !defendingPokemon.type) {
-        console.error("Invalid defending Pokémon:", defendingPokemon);
-        return 0;
-    }
-
-    let modifier = 1;
-    let attackType = move.type.toLowerCase();
-    let defendingTypes = Array.isArray(defendingPokemon.type) 
-        ? defendingPokemon.type.map(type => type.toLowerCase()) 
-        : [defendingPokemon.type.toLowerCase()];
-
-    let effectiveness = getTypeEffectiveness(attackType, defendingTypes);
-
-    if (getSTAB(attackType, attackingPokemon.type)) {
-        modifier *= 1.5;
-    }
-
-    let damage = 0;
-
-    if (move.category.toLowerCase() === 'physical') {
-        damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.attack / defendingPokemon.defense)) / 50 + 2) * (effectiveness * modifier);
-    } else {
-        damage = ((((2 * attackingPokemon.level) / 5 + 2) * move.power * (attackingPokemon.spattack / defendingPokemon.spdef)) / 50 + 2) * (effectiveness * modifier);
-    }
-
-    return Math.round(damage); // Ensure damage is an integer
-}
-
-function attackPokemon(attackingPokemon, defendingPokemon, move) {
-    let damageDealt = calculateDamage(attackingPokemon, defendingPokemon, move);
-    defendingPokemon.health -= damageDealt;
-    defendingPokemon.health = Math.max(defendingPokemon.health, 0);
-}
-
-function HealPokemon (pokemon, amount) { //Amount is a float that represents a percentage of a pokemons max health (0.5 is most common)
-    let amountHealed = 0;
-    if(pokemon.health + (pokemon.maxHealth * amount) > pokemon.maxHealth) {
-        amountHealed = (pokemon.maxHealth - pokemon.health);
-        pokemon.health = pokemon.maxHealth;
-
-    }
-    else {
-        amountHealed = (pokemon.maxHealth * amount);
-        pokemon.health += (pokemon.maxHealth * amount);
-    }
-
-    console.log(`${pokemon.name} healed ${amountHealed} hp`);
-}
-
-function DrainPokemon(user, target, move) {
-    let drainAmount = calculateDamage(user, target, move);
-    attackPokemon(user, target, move);
-    let amount = move.healPercentage;
-
-    let amountHealed = 0;
-    if(user.health + (drainAmount * amount) > user.maxHealth) {
-        amountHealed = (user.maxHealth - user.health);
-        user.health = user.maxHealth;
-
-    }
-    else {
-        amountHealed = (drainAmount * amount);
-        user.health += (drainAmount * amount);
-    }
-
-    console.log(`${user.name} healed ${amountHealed} hp`);
 }
 
 function UpdateHealthBar() {  
@@ -239,6 +163,7 @@ async function doesHitAdvanced(user, target, move) {
             }
             else {
                 await typeText(`${user.name} is asleep. It cannot move!`);
+                await delay(delayAmount);
                 return false;
             }
         }
@@ -295,7 +220,7 @@ function OpenSwitchPokemon() {
             }
         }
 
-        return `<div class="pokemon-summarry" id="pokemon-${index + 1}">
+        return `<div class="pokemon-summarry" id="pokemon-${index + 1}" data-index="${index}">
                     <img src="${pokemon.frontSprite}" alt="pokemon">
                     <h1>${pokemon.name}</h1>
                     <p> LV: ${pokemon.level} ${gender}</p> 
@@ -303,9 +228,69 @@ function OpenSwitchPokemon() {
                 </div>`;
     }
 
-    const pokemonTabsHTML = yourPokemonTeam.map((pokemon, index) => PokemonTabTemplate(pokemon, index)).join("");
-    teamHolder.innerHTML = pokemonTabsHTML;
+    function MoveInfoTemplate(move){
+        return `<div class="pokemon-move">
+                    ${generateTypeIcons(move.type, "move-type-picture")}
+                    <p>${move.name}</p>
+                    <p>${move.pp}</p>
+                </div>`
+    }
+
+    function ConvertStatusToText(status) {
+        if (status === null || status.toLowerCase() === "") {
+            return `<span style="color: #32CD32">Healthy</span>`;
+        } else if (status.toLowerCase() === "psn") {
+            return `<span style="color:rgb(161, 90, 205) ">Poisoned</span>`;
+        } else if (status.toLowerCase() === "tox") {
+            return `<span style="color: #9400D3 ">Badly Poisoned</span>`;
+        } else if (status.toLowerCase() === "brn") {
+            return `<span style="color: #FF4500  ">Burned</span>`;
+        } else if (status.toLowerCase() === "par") {
+            return `<span style="color: #FFD700  ">Paralysed</span>`;
+        } else if (status.toLowerCase() === "slp") {
+            return `<span style="color: #ADD8E6  ">Asleep</span>`;
+        } else if (status.toLowerCase() === "frz") {
+            return `<span style="color: #00FFFF  ">Frozen</span>`;
+        }
+    }
+    
+
+    // Generate and insert HTML
+    teamHolder.innerHTML = yourPokemonTeam.map((pokemon, index) => PokemonTabTemplate(pokemon, index)).join("");
+
+    // Add hover event listeners
+    document.querySelectorAll(".pokemon-summarry").forEach(pokemonElement => {
+        pokemonElement.addEventListener("mouseenter", (event) => {
+            //console.log("Hovered over:", event.currentTarget.id);
+
+            let index = event.currentTarget.dataset.index;
+
+            let html = `<div id="pokemon-info-holder">
+                            <p>${yourPokemonTeam[index].name}</p>
+                            <p>Status: ${ConvertStatusToText(yourPokemonTeam[index].status)}</p>
+                            <p>Type: ${generateTypeIcons(yourPokemonTeam[index].type, "pokemon-info-holder-type-img")}</p>
+                        </div>
+                        ${MoveInfoTemplate(yourPokemonTeam[index].move1)}
+                        ${MoveInfoTemplate(yourPokemonTeam[index].move2)}
+                        ${MoveInfoTemplate(yourPokemonTeam[index].move3)}
+                        ${MoveInfoTemplate(yourPokemonTeam[index].move4)}`
+
+            pokemonInfoHolder.innerHTML = html;
+        });
+
+        pokemonElement.addEventListener("mouseleave", () => {
+            //console.log("No longer hovering");
+        });
+
+        pokemonElement.addEventListener("click", (event) => {
+            let index = event.currentTarget.dataset.index;
+            let selectedPokemon = yourPokemonTeam[index];
+
+            console.log(selectedPokemon);
+        });
+    });
 }
+
 
 
 // MOST IMPORTANT FUNCTION
@@ -349,21 +334,25 @@ async function processTurn(yourMove) {
                     HealPokemon(user, move.healPercentage);
                 }
                 else if(move.category.toLowerCase() === "status") {
-                    target.status = move.statusType.toLowerCase();
+                    let whoIsEffected = target;
+                    if(move.statusTarget === 0){ //0 is self 1 is other
+                        whoIsEffected = user;
+                    }
+                    whoIsEffected.status = move.statusType.toLowerCase();
                     if(move.statusType.toLowerCase() === "pzn"){
-                        await typeText(`${target.name} is now poisoned!`);
+                        await typeText(`${whoIsEffected.name} is now poisoned!`);
                         await delay(delayAmount);
                     } else if(move.statusType.toLowerCase() === "frz"){
-                        await typeText(`${target.name} is now frozen!`);
+                        await typeText(`${whoIsEffected.name} is now frozen!`);
                         await delay(delayAmount);
                     } else if(move.statusType.toLowerCase() === "slp"){
-                        await typeText(`${target.name} is now asleep!`);
+                        await typeText(`${whoIsEffected.name} is now asleep!`);
                         await delay(delayAmount);
                     } else if(move.statusType.toLowerCase() === "con"){
-                        await typeText(`${target.name} is now confused!`);
+                        await typeText(`${whoIsEffected.name} is now confused!`);
                         await delay(delayAmount);
                     } else if(move.statusType.toLowerCase() === "inf"){
-                        await typeText(`${target.name} fell in love with ${user.name}!`);
+                        await typeText(`${whoIsEffected.name} fell in love with ${user.name}!`);
                         await delay(delayAmount);
                     }
                 }
@@ -505,6 +494,11 @@ function init(yourTeam, opponentsTeam) {
 
     //Updates switch pokemon
     switchPokemonScreen.style.display = "none";
+
+    move1Button.innerText = `${yourActivePokemon.move1.name}`;
+    move2Button.innerText = `${yourActivePokemon.move2.name}`;
+    move3Button.innerText = `${yourActivePokemon.move3.name}`;
+    move4Button.innerText = `${yourActivePokemon.move4.name}`;
 }
 
 async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a reference to either yourActivePokemon or opponentsActivePokemon
@@ -555,14 +549,6 @@ init(yourPokemonTeam, opponentsPokemonTeam);
 console.log(yourPokemonTeam);
 console.log(opponentsPokemonTeam);
 
-function InitMoveUI() {
-    move1Button.innerText = `${yourActivePokemon.move1.name}`;
-    move2Button.innerText = `${yourActivePokemon.move2.name}`;
-    move3Button.innerText = `${yourActivePokemon.move3.name}`;
-    move4Button.innerText = `${yourActivePokemon.move4.name}`;
-}
-InitMoveUI();
-
 attackButton.addEventListener("click", function() {
     moveHolder.style.display = "flex";
     actionHolder.style.display = "None"
@@ -588,8 +574,11 @@ move4Button.addEventListener("click", function() {
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Tab") {
-        event.preventDefault(); // Prevents browser focus switching
-        console.log("Tab key pressed! Toggling menu...");
-        switchPokemonScreen.style.display = "none";
+        if(blockTab === false){
+            event.preventDefault(); // Prevents browser focus switching
+            switchPokemonScreen.style.display = "none";
+            moveHolder.style.display = "none";
+            actionHolder.style.display = "flex";
+        }
     }
 });

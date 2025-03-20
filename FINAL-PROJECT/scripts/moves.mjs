@@ -210,6 +210,17 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Rest",
+    type: "Psychic",
+    category: "Status",
+    statusType: "slp",
+    statusTarget: 0,
+    accuracy: 100,
+    pp: 10,
+    priority: 0,
+    description: "The user goes to sleep for two turns, fully restoring its HP and curing any status conditions."
+  },
+  {
     name: "Return",
     type: "Normal",
     category: "Physical",
