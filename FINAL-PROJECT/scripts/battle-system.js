@@ -264,7 +264,19 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
             }
             else {
                 if (move.category.toLowerCase() === "physical" || move.category.toLowerCase() === "special") {
-                    attackPokemon(user, target, move);
+
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
                 } 
                 else if (move.category.toLowerCase() === "healing") {
                     HealPokemon(user, move.healPercentage);

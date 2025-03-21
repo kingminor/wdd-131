@@ -226,8 +226,13 @@ function calculateDamage(attackingPokemon, defendingPokemon, move) {
     return Math.round(damage); // Ensure damage is an integer
 }
 
-function attackPokemon(attackingPokemon, defendingPokemon, move) {
+function attackPokemon(attackingPokemon, defendingPokemon, move, isCrit) {
     let damageDealt = calculateDamage(attackingPokemon, defendingPokemon, move);
+
+    if(isCrit === true){
+        damageDealt *= 1.5;
+    }
+
     defendingPokemon.health -= damageDealt;
     defendingPokemon.health = Math.max(defendingPokemon.health, 0);
 }
