@@ -165,7 +165,7 @@ function OpenSwitchPokemon() {
             let selectedPokemon = yourPokemonTeam[index];
         
             if (selectedPokemon.health > 0) {
-                YouSwitchPokemon(selectedPokemon);
+                processTurn("switch",undefined, selectedPokemon);
             } else {
                 alert(`${selectedPokemon.name} has fainted and cannot be sent out!`);
             }
@@ -174,10 +174,63 @@ function OpenSwitchPokemon() {
     });
 }
 
+async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a reference to either yourActivePokemon or opponentsActivePokemon
+
+    await typeText(`Opponent sent out ${newActivePokemon.name}!`)
+    await delay(delayAmount);
+
+    opponentsActivePokemon = newActivePokemon;
+
+    //Initializes Health Bars
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+
+    //Updates Names Tags
+    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
+
+    //Updates Sprites
+    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
+
+    opponentsPokemonSprite.classList.remove("faint");
+    opponentsPokemonSprite.classList.add("pokemon-enter-glow");
+}
+
+async function YouSwitchPokemon (newActivePokemon) {
+
+    switchPokemonScreen.style.display = "none";
+    actionHolder.style.display = "none";
+    yourPokemonSprite.classList.remove("pokemon-enter-glow");
+    dialogBox.style.display = "flex";
+    console.log("atempting to switch pokemon");
+
+    if(yourActivePokemon.health > 0){
+        await typeText(`Great job ${yourActivePokemon.name}! Return!`);
+        await delay(delayAmount);
+        yourPokemonSprite.classList.add("retreat-animation");
+        await delay(delayAmount);
+    }
+
+    await typeText(`Go, ${newActivePokemon.name}! Show them what you've got!`);
+    await delay(delayAmount);
+
+    yourActivePokemon = newActivePokemon;
+
+    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+
+    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
+
+    yourPokemonSprite.src = yourActivePokemon.backSprite;
+
+    yourPokemonSprite.classList.remove("retreat-animation");
+    yourPokemonSprite.classList.remove("faint");
+    yourPokemonSprite.classList.add("pokemon-enter-glow");
+
+    await delay(delayAmount);
+}
+
 
 
 // MOST IMPORTANT FUNCTION
-async function processTurn(yourMove) {
+async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
     dialogBox.style.display = "flex";
     moves.style.display = "none";
 
@@ -251,24 +304,8 @@ async function processTurn(yourMove) {
         }
     }
 
-    if (yourMove.priority > opponentsMove.priority) {
-        await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-        UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-        if (opponentsActivePokemon.health > 0) {
-            await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-        }
-    }
-    else if (opponentsMove.priority > yourMove.priority) {
-        await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
-        UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-        if (yourActivePokemon.health > 0) {
-            await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
-            UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-        }
-    }
-    else {
-        if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
+    if(actionType.toLowerCase() === "move"){
+        if (yourMove.priority > opponentsMove.priority) {
             await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
             UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             if (opponentsActivePokemon.health > 0) {
@@ -276,7 +313,7 @@ async function processTurn(yourMove) {
                 UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             }
         }
-        else {
+        else if (opponentsMove.priority > yourMove.priority) {
             await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
             UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             if (yourActivePokemon.health > 0) {
@@ -284,6 +321,30 @@ async function processTurn(yourMove) {
                 UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
             }
         }
+        else {
+            if (yourActivePokemon.speed >= opponentsActivePokemon.speed) {
+                await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+                UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+                if (opponentsActivePokemon.health > 0) {
+                    await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+                    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+                }
+            }
+            else {
+                await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+                UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+                if (yourActivePokemon.health > 0) {
+                    await ExecuteMove(yourActivePokemon, opponentsActivePokemon, yourMove);
+                    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
+                }
+            }
+        }
+    } else if(actionType.toLowerCase() === "switch") {
+        await YouSwitchPokemon(newPokemon);
+        console.log("oponents MOVE!")
+        let opponentsMove = GetEnemyMove();
+        await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
+        UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
     }
 
     UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
@@ -381,61 +442,6 @@ function init(yourTeam, opponentsTeam) {
     move4Button.innerText = `${yourActivePokemon.move4.name}`;
 }
 
-async function OpponentSwitchPokemon(newActivePokemon){ //Active slot is a reference to either yourActivePokemon or opponentsActivePokemon
-
-    await typeText(`Opponent sent out ${newActivePokemon.name}!`)
-    await delay(delayAmount);
-
-    opponentsActivePokemon = newActivePokemon;
-
-    //Initializes Health Bars
-    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-
-    //Updates Names Tags
-    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
-
-    //Updates Sprites
-    opponentsPokemonSprite.src = opponentsActivePokemon.frontSprite;
-
-    opponentsPokemonSprite.classList.remove("faint");
-    opponentsPokemonSprite.classList.add("pokemon-enter-glow");
-}
-
-async function YouSwitchPokemon (newActivePokemon) {
-
-    switchPokemonScreen.style.display = "none";
-    actionHolder.style.display = "none";
-    yourPokemonSprite.classList.remove("pokemon-enter-glow");
-    dialogBox.style.display = "flex";
-    console.log("atempting to switch pokemon");
-
-    if(yourActivePokemon.health > 0){
-        await typeText(`Great job ${yourActivePokemon.name}! Return!`);
-        await delay(delayAmount);
-        yourPokemonSprite.classList.add("retreat-animation");
-        await delay(delayAmount);
-    }
-
-    await typeText(`Go, ${newActivePokemon.name}! Show them what you've got!`);
-    await delay(delayAmount);
-
-    yourActivePokemon = newActivePokemon;
-
-    UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
-
-    UpdateNameTags(yourActivePokemon, opponentsActivePokemon);
-
-    yourPokemonSprite.src = yourActivePokemon.backSprite;
-
-    yourPokemonSprite.classList.remove("retreat-animation");
-    yourPokemonSprite.classList.remove("faint");
-    yourPokemonSprite.classList.add("pokemon-enter-glow");
-
-    await delay(delayAmount);
-    actionHolder.style.display = "flex";
-    dialogBox.style.display = "none";
-}
-
 GenerateTeamFromPokemon(yourPokemonTeam, testTeam1)
 
 GenerateTeamFromPokemon(opponentsPokemonTeam, testTeam2)
@@ -453,19 +459,19 @@ attackButton.addEventListener("click", function() {
 switchPokemonButton.addEventListener("click", OpenSwitchPokemon);
 
 move1Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move1);
+    processTurn("move", yourActivePokemon.move1);
 });
 
 move2Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move2);
+    processTurn("move", yourActivePokemon.move2);
 });
 
 move3Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move3);
+    processTurn("move", yourActivePokemon.move3);
 });
 
 move4Button.addEventListener("click", function() {
-    processTurn(yourActivePokemon.move4);
+    processTurn("move", yourActivePokemon.move4);
 });
 
 document.addEventListener("keydown", function(event) {
