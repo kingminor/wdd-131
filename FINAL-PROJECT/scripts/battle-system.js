@@ -225,6 +225,11 @@ async function YouSwitchPokemon (newActivePokemon) {
     yourPokemonSprite.classList.add("pokemon-enter-glow");
 
     await delay(delayAmount);
+
+    move1Button.innerText = `${yourActivePokemon.move1.name}`;
+    move2Button.innerText = `${yourActivePokemon.move2.name}`;
+    move3Button.innerText = `${yourActivePokemon.move3.name}`;
+    move4Button.innerText = `${yourActivePokemon.move4.name}`;
 }
 
 
