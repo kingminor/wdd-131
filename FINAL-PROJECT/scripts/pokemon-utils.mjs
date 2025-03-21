@@ -3,6 +3,12 @@ import movesList from "./moves.mjs";
 import {typeText, UpdateHealthBar, UpdateNameTags} from "./ui-utils.mjs";
 import {getTypeEffectiveness} from "./typeChart.mjs";
 
+const delayAmount = 1200;
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function calculateHealth(inputPokemon) {
     let EV = 510;
     let IV = 31;
@@ -97,7 +103,7 @@ const testTeam1 = [
         move1: "Dark Pulse",
         move2: "Crunch",
         move3: "Moonlight",
-        move4: "Rest",
+        move4: "Giga Drain",
         gender: 0
     },
     {
@@ -252,9 +258,22 @@ function HealPokemon (pokemon, amount) { //Amount is a float that represents a p
     console.log(`${pokemon.name} healed ${amountHealed} hp`);
 }
 
-function DrainPokemon(user, target, move) {
+async function DrainPokemon(user, target, move) {
+
+    let isCrit = false;
     let drainAmount = calculateDamage(user, target, move);
-    attackPokemon(user, target, move);
+
+    if(doesSucceed(move.critChance * 100)){
+        isCrit = true;
+    } else {isCrit = false;}
+
+    attackPokemon(user, target, move, isCrit);
+
+    if(isCrit === true){
+        drainAmount *= 1.5;
+        await typeText("Its a Critical Hit");
+        await delay(delayAmount);
+    }
     let amount = move.healPercentage;
 
     let amountHealed = 0;

@@ -119,7 +119,7 @@ const movesList = [
     pp: 10,
     priority: 0,
     description: "A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.",
-    critChance: 0.0625  // Default crit rate
+    critChance: 1.0625  // Default crit rate
   },
   {
     name: "Ice Beam",

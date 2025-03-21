@@ -247,16 +247,38 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
             await delay(delayAmount);
             if(move.specialBehavior != null){
                 if(move.specialBehavior.toLowerCase() === "drain"){
-                    DrainPokemon(user, target, move);
+                    await DrainPokemon(user, target, move);
                 } 
                 else if (move.specialBehavior.toLowerCase() === "dmg-psn") {
-                    attackPokemon(user, target, move);
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
                     if(doesSucceed(move.statusAccuracy)){
                         target.status = "psn";
                     }
                 }
                 else if (move.specialBehavior.toLowerCase() === "dmg-tox") {
-                    attackPokemon(user, target, move);
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
                     if(doesSucceed(move.statusAccuracy)){
                         target.status = "tox";
                     }
