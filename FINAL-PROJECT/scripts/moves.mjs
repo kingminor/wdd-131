@@ -22,6 +22,19 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Bite",
+    type: "Dark",
+    category: "Special",
+    specialBehavior: "flinch",
+    power: 60,
+    accuracy: 100,
+    statusAccuracy: 0.3,
+    pp: 25,
+    priority: 0,
+    description: "The target is bitten with viciously sharp fangs. This may also make the target flinch.",
+    critChance: 0.0625
+  },
+  {
     name: "Close Combat",
     type: "Fighting",
     category: "Physical",
@@ -65,6 +78,17 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Dazzling Gleam",
+    type: "Fairy",
+    category: "Special",
+    power: 80,
+    accuracy: 100,
+    pp: 10,
+    priority: 0,
+    description: "The user damages opposing Pokémon by emitting a powerful flash.",
+    critChance: 0.0625
+  },
+  {
     name: "Extreme Speed",
     type: "Normal",
     category: "Physical",
@@ -85,6 +109,32 @@ const movesList = [
     priority: 0,
     description: "The user unleashes a massive blast of fire. This may also burn the target.",
     critChance: 0.0625  // Default crit rate
+  },
+  {
+    name: "Fire Fang",
+    type: "Fire",
+    category: "Physical",
+    specialBehavior: "dmg-brn",
+    power: 65,
+    accuracy: 95,
+    statusAccuracy: 10,
+    pp: 15,
+    priority: 0,
+    description: "The user bites with flame-cloaked fangs. This may also leave the target with a burn.",
+    critChance: 0.065
+  },
+  {
+    name: "Flare Blitz",
+    type: "Fire",
+    category: "Physical",
+    specialBehavior: "recoil",
+    power: 120,
+    recoilAmount: 0.33,
+    accuracy: 100,
+    pp: 15,
+    priority: 0,
+    description: "The user cloaks itself in fire and charges the target to inflict damage. This also damages the user quite a lot.",
+    critChance: 0.0625
   },
   {
     name: "Fusion Bolt",
@@ -120,6 +170,17 @@ const movesList = [
     priority: 0,
     description: "A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.",
     critChance: 1.0625  // Default crit rate
+  },
+  {
+    name: "Hyper Beam",
+    type: "Normal",
+    category: "Special",
+    specialBehavior: "recharge",
+    power: 150,
+    accuracy: 90,
+    pp: 5,
+    description: 'The target is attacked with a powerful beam. The user can’t move on the next turn.',
+    critChance: 0.0625
   },
   {
     name: "Ice Beam",
@@ -188,6 +249,19 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Psybeam",
+    type: "Psychic",
+    category: "Special",
+    specialBehavior: "dmg-con",
+    power: 65,
+    accuracy: 100,
+    statusAccuracy: 10,
+    pp: 20,
+    priority: 0,
+    description: "The target is attacked with a peculiar ray. This may also confuse the target.",
+    critChance: 0.0625
+  },
+  {
     name: "Psychic",
     type: "Psychic",
     category: "Special",
@@ -205,7 +279,7 @@ const movesList = [
     power: 40,
     accuracy: 100,
     pp: 30,
-    priority: 1,
+    priority: 10000,
     description: "The user strikes first with a quick attack.",
     critChance: 0.0625  // Default crit rate
   },

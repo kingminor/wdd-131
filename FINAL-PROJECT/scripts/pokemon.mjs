@@ -13,7 +13,6 @@ const Pokemon = [
       moves: [
           "Tackle",
           "Quick Attack",
-          "Return",
           "Hyper Beam",
           "Shadow Ball"
       ],
@@ -36,7 +35,7 @@ const Pokemon = [
           "Shadow Ball",
           "Psybeam",
           "Dazzling Gleam",
-          "Future Sight"
+          //"Future Sight"
       ],
       pokedexNumber: 196,
       genderRatio: 0.875 // 87.5% male, 12.5% female
@@ -56,7 +55,7 @@ const Pokemon = [
         "Flare Blitz",
         "Fire Fang",
         "Quick Attack",
-        "Superpower",
+        //"Superpower",
         "Will-O-Wisp",
         "Bite"
     ],

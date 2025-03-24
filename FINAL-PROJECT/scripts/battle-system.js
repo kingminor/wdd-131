@@ -244,6 +244,19 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
     async function ExecuteMove(user, target, move) {
         if (move.pp <= 0) {
             await typeText(`${user.name} tried to use ${move.name}, but it failed!`);
+            await delay(delayAmount);
+            return;
+        }
+
+        if(user.isRecharging === 1){
+            await typeText(`${user.name} is tired and needs to recharge!`);
+            await delay(delayAmount);
+            return;
+        }
+
+        if(user.status.toLowerCase() != null && user.isflinched === 1){
+            await typeText(`${user.name} flinched!`);
+            await delay(delayAmount);
             return;
         }
 
@@ -286,6 +299,89 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
                     }
                     if(doesSucceed(move.statusAccuracy)){
                         target.status = "tox";
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "dmg-con") {
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    if(doesSucceed(move.statusAccuracy)){
+                        target.status = "con";
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "dmg-brn") {
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    if(doesSucceed(move.statusAccuracy)){
+                        target.status = "brn";
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "recharge") {
+                    user.isRecharging = 1;
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "recoil"){
+                    let isCrit = false;
+                    let recoil = calculateDamage(user, target, move);
+                
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+                
+                    attackPokemon(user, target, move, isCrit);
+                
+                    if(isCrit === true){
+                        recoil *= 1.5;
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    user.health -= (recoil * move.recoilAmount);
+                }
+                else if (move.specialBehavior.toLowerCase() === "flinch") {
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    if(doesSucceed(move.statusAccuracy)){
+                        target.isflinched = 1;
                     }
                 }
             }
@@ -380,7 +476,7 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
         }
     } else if(actionType.toLowerCase() === "switch") {
         await YouSwitchPokemon(newPokemon);
-        console.log("oponents MOVE!")
+        //console.log("oponents MOVE!")
         let opponentsMove = GetEnemyMove();
         await ExecuteMove(opponentsActivePokemon, yourActivePokemon, opponentsMove);
         UpdateHealthBar(yourActivePokemon, opponentsActivePokemon);
@@ -417,6 +513,10 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
                 await typeText(`${pokemon.name} took damage from it's burn!`);
                 await delay(1500);
             }
+        }
+
+        if(pokemon.isflinched === 1){
+            pokemon.isflinched =0;
         }
     }
 

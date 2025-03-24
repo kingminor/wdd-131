@@ -103,7 +103,7 @@ const testTeam1 = [
         move1: "Dark Pulse",
         move2: "Crunch",
         move3: "Moonlight",
-        move4: "Giga Drain",
+        move4: "Hyper Beam",
         gender: 0
     },
     {
