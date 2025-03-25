@@ -254,7 +254,7 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
             return;
         }
 
-        if(user.status.toLowerCase() != null && user.isflinched === 1){
+        if(user.status != null && user.isflinched === 1){
             await typeText(`${user.name} flinched!`);
             await delay(delayAmount);
             return;
