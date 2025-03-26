@@ -248,7 +248,7 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
             return;
         }
 
-        if(user.isRecharging === 1){
+        if(user.isRecharging === true){
             await typeText(`${user.name} is tired and needs to recharge!`);
             await delay(delayAmount);
             return;
@@ -335,8 +335,43 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
                         target.status = "brn";
                     }
                 }
+                else if (move.specialBehavior.toLowerCase() === "dmg-frz") {
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    if(doesSucceed(move.statusAccuracy)){
+                        target.status = "frz";
+                    }
+                }
+                else if (move.specialBehavior.toLowerCase() === "dmg-par") {
+                    let isCrit = false;
+
+                    if(doesSucceed(move.critChance * 100)){
+                        isCrit = true;
+                    } else {isCrit = false;}
+
+                    attackPokemon(user, target, move, isCrit);
+
+                    if(isCrit === true){
+                        await typeText("Its a Critical Hit");
+                        await delay(delayAmount);
+                    }
+                    if(doesSucceed(move.statusAccuracy)){
+                        target.status = "par";
+                    }
+                }
                 else if (move.specialBehavior.toLowerCase() === "recharge") {
-                    user.isRecharging = 1;
+                    user.isRecharging = true;
+                    user.turnsSinceChargeStart = 0;
                     let isCrit = false;
 
                     if(doesSucceed(move.critChance * 100)){
@@ -518,6 +553,15 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
         if(pokemon.isflinched === 1){
             pokemon.isflinched =0;
         }
+
+        if(pokemon.isRecharging === true){
+            if(pokemon.turnsSinceChargeStart === 0){
+                pokemon.turnsSinceChargeStart += 1;
+            } else if(pokemon.turnsSinceChargeStart === 1){
+                pokemon.turnsSinceChargeStart === 0;
+                pokemon.isRecharging = false;
+            }
+        }
     }
 
     await pokemonCheckup(yourActivePokemon);
@@ -532,6 +576,7 @@ async function processTurn(actionType, yourMove, newPokemon, itemUsed) {
         await typeText(`${yourActivePokemon.name} fainted!`);
         yourPokemonSprite.classList.add("faint");
         await delay(delayAmount);
+        OpenSwitchPokemon();
     }
 
     //Did your oppoents pokemon get knocked out

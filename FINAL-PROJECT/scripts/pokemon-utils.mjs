@@ -116,33 +116,33 @@ const testTeam1 = [
     },
     {
         name: "Zekrom",
-        move1: "Tackle",
-        move2: "Psychic",
-        move3: "Moonlight",
-        move4: "Toxic Surge",
+        move1: "Thunderbolt",
+        move2: "Fusion Bolt",
+        move3: "Outrage",
+        move4: "Quick Attack",
     },
     {
         name: "Zoroark",
-        move1: "Tackle",
-        move2: "Psychic",
-        move3: "Moonlight",
-        move4: "Toxic Surge",
+        move1: "Night Slash",
+        move2: "Shadow Ball",
+        move3: "Flamethrower",
+        move4: "Sludge Bomb",
         gender: 0
     },
     {
         name: "Lucario",
-        move1: "Tackle",
-        move2: "Psychic",
-        move3: "Moonlight",
-        move4: "Toxic Surge",
+        move1: "Aura Sphere",
+        move2: "Close Combat",
+        move3: "Iron Tail",
+        move4: "Flash Cannon",
         gender: 0
     },
     {
         name: "Eevee",
         move1: "Tackle",
-        move2: "Psychic",
-        move3: "Moonlight",
-        move4: "Toxic Surge",
+        move2: "Quick Attack",
+        move3: "Hyper Beam",
+        move4: "Shadow Ball",
         gender: 0
     },
 ]

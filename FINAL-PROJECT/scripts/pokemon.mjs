@@ -76,10 +76,11 @@ const Pokemon = [
     moves: [
         "Ice Beam",
         "Shadow Ball",
-        "Mirror Coat",
+        //"Mirror Coat",
         "Blizzard",
-        "Freeze-Dry",
-        "Hail"
+        //"Freeze-Dry",
+        //"Hail"
+        "Tackle"
     ],
     pokedexNumber: 471,
     genderRatio: 0.875
@@ -121,9 +122,10 @@ const Pokemon = [
         "Thunderbolt",
         "Thunder Wave",
         "Shadow Ball",
-        "Pin Missile",
-        "Volt Switch",
-        "Hidden Power Ice"
+        "Tackle"
+        //"Pin Missile",
+        //"Volt Switch",
+        //"Hidden Power Ice"
     ],
     pokedexNumber: 135,
     genderRatio: 0.875
@@ -141,11 +143,11 @@ const Pokemon = [
     backSprite: "images/poke/leafeon/leafeon-back.gif",
     moves: [
         "Leaf Blade",
-        "Swords Dance",
+        //"Swords Dance",
         "X-Scissor",
         "Quick Attack",
         "Synthesis",
-        "Knock Off"
+        //"Knock Off"
     ],
     pokedexNumber: 470,
     genderRatio: 0.875
@@ -184,7 +186,7 @@ const Pokemon = [
       frontSprite: "images/poke/umbreon/umbreon.gif",
       backSprite: "images/poke/umbreon/umbreon-back.gif",
       moves: [
-          "Foul Play",
+          //"Foul Play",
           "Dark Pulse",
           "Payback",
           "Confuse Ray",
@@ -208,10 +210,11 @@ const Pokemon = [
     moves: [
         "Scald",
         "Ice Beam",
-        "Aqua Ring",
-        "Acid Armor",
+        //"Aqua Ring",
+        //"Acid Armor",
         "Hydro Pump",
-        "Wish"
+        //"Wish"
+        "Tackle"
     ],
     pokedexNumber: 134,
     genderRatio: 0.875
@@ -231,9 +234,10 @@ const Pokemon = [
           "Thunderbolt",
           "Fusion Bolt",
           "Outrage",
-          "Dragon Claw",
-          "Volt Switch",
-          "Wild Charge"
+          //"Dragon Claw",
+          //"Volt Switch",
+          //"Wild Charge"
+          "Quick Attack"
       ],
       pokedexNumber: 644,
       genderRatio: null // Genderless
@@ -251,10 +255,10 @@ const Pokemon = [
       backSprite: "images/poke/zoroark/zoroark-back.gif",
       moves: [
           "Night Slash",
-          "Foul Play",
+          //"Foul Play",
           "Shadow Ball",
           "Flamethrower",
-          "Pursuit",
+          //"Pursuit",
           "Sludge Bomb"
       ],
       pokedexNumber: 571,

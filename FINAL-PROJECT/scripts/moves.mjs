@@ -28,10 +28,23 @@ const movesList = [
     specialBehavior: "flinch",
     power: 60,
     accuracy: 100,
-    statusAccuracy: 0.3,
+    statusAccuracy: 30,
     pp: 25,
     priority: 0,
     description: "The target is bitten with viciously sharp fangs. This may also make the target flinch.",
+    critChance: 0.0625
+  },
+  {
+    name: "Blizzard",
+    type: "Ice",
+    category: "Special",
+    specialBehavior: "dmg-frz",
+    power: 110,
+    accuracy: 70,
+    statusAccuracy: 10,
+    pp: 5,
+    priority: 0,
+    description: "A howling blizzard is summoned to strike opposing Pokémon. This may also leave the opposing Pokémon frozen.",
     critChance: 0.0625
   },
   {
@@ -70,8 +83,10 @@ const movesList = [
     name: "Dark Pulse",
     type: "Dark",
     category: "Special",
+    speechSynthesis: "flinch",
     power: 80,
     accuracy: 100,
+    statusAccuracy: 20,
     pp: 15,
     priority: 0,
     description: "The user releases a horrible aura imbued with dark thoughts. This may also cause the target to flinch.",
@@ -95,7 +110,7 @@ const movesList = [
     power: 80,
     accuracy: 100,
     pp: 5,
-    priority: 2,
+    priority: 100,
     description: "The user attacks with great speed, striking first.",
     critChance: 0.0625  // Default crit rate
   },
@@ -103,8 +118,10 @@ const movesList = [
     name: "Fire Blast",
     type: "Fire",
     category: "Special",
+    specialBehavior: "dmg-brn",
     power: 110,
     accuracy: 85,
+    statusAccuracy: 10,
     pp: 5,
     priority: 0,
     description: "The user unleashes a massive blast of fire. This may also burn the target.",
@@ -121,7 +138,20 @@ const movesList = [
     pp: 15,
     priority: 0,
     description: "The user bites with flame-cloaked fangs. This may also leave the target with a burn.",
-    critChance: 0.065
+    critChance: 0.0625
+  },
+  {
+    name: "Flamethrower",
+    type: "Fire",
+    category: "Special",
+    specialBehavior: "dmg-brn",
+    power: 90,
+    accuracy: 100,
+    statusAccuracy: 10,
+    pp:15,
+    priority: 0,
+    description: "The target is scorched with an intense blast of fire. This may also leave the target with a burn.",
+    critChance: 0.0625
   },
   {
     name: "Flare Blitz",
@@ -134,6 +164,17 @@ const movesList = [
     pp: 15,
     priority: 0,
     description: "The user cloaks itself in fire and charges the target to inflict damage. This also damages the user quite a lot.",
+    critChance: 0.0625
+  },
+  {
+    name: "Flash Cannon",
+    type: "Steel",
+    category: "Special",
+    power: 80,
+    accuracy: 100,
+    pp: 10,
+    priority: 0,
+    description: "The user gathers all its light energy and releases it at once. This may also lower the target’s Sp. Def stat.",
     critChance: 0.0625
   },
   {
@@ -169,7 +210,18 @@ const movesList = [
     pp: 10,
     priority: 0,
     description: "A nutrient-draining attack. The user's HP is restored by half the damage taken by the target.",
-    critChance: 1.0625  // Default crit rate
+    critChance: 0.0625  // Default crit rate
+  },
+  {
+    name: "Hydro Pump",
+    type: "Water",
+    category: "Special",
+    power: 110,
+    accuracy: 80,
+    pp: 5,
+    priority: 0,
+    description: "The target is blasted by a huge volume of water launched under great pressure.",
+    critChance: 0.0625
   },
   {
     name: "Hyper Beam",
@@ -186,8 +238,10 @@ const movesList = [
     name: "Ice Beam",
     type: "Ice",
     category: "Special",
+    specialBehavior: "dmg-frz",
     power: 90,
     accuracy: 100,
+    statusAccuracy: 10,
     pp: 10,
     priority: 0,
     description: "The user shoots a beam of ice at the target. This may also freeze the target.",
@@ -203,6 +257,28 @@ const movesList = [
     priority: 0,
     description: "The user attacks with a hard tail that may also lower the target's Defense.",
     critChance: 0.0625  // Default crit rate
+  },
+  {
+    name: "Leaf Blade",
+    type: "Grass",
+    category: "Physical",
+    power: 90,
+    accuracy: 100,
+    pp: 15,
+    priority: 0,
+    description: "The user handles a sharp leaf like a sword and cuts the target to inflict damage. This move has a heightened chance of landing a critical hit.",
+    critChance: 0.125
+  },
+  {
+    name: "Metal Claw",
+    type: "Steel",
+    category: "Physical",
+    power: 50,
+    accuracy: 95,
+    pp: 35,
+    priority: 0,
+    description: "The target is raked with steel claws. This may also boost the user’s Attack stat.",
+    critChance: 0.0625
   },
   {
     name: "Moonlight",
@@ -306,6 +382,19 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Scald",
+    type: "Water",
+    category: "Special",
+    specialBehavior: "dmg-brn",
+    power: 80,
+    accuracy: 100,
+    statusAccuracy: 30,
+    pp: 15,
+    priority: 0,
+    description: "The user attacks by shooting boiling hot water at the target. This may also leave the target with a burn.",
+    critChance: 0.0625
+  },
+  {
     name: "Shadow Ball",
     type: "Ghost",
     category: "Special",
@@ -317,26 +406,59 @@ const movesList = [
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Sludge Bomb",
+    type: "Poison",
+    category: "Special",
+    specialBehavior: "dmg-psn",
+    power: 90,
+    accuracy: 100,
+    statusAccuracy: 30,
+    pp: 10,
+    priority: "The user hurls unsanitary sludge at the target to inflict damage. This may also poison the target.",
+    critChance: 0.0625
+  },
+  {
+    name: "Synthesis",
+    type: "Grass",
+    category: "healing",
+    healPercentage: 0.5,
+    accuracy: 100,
+    pp: 5,
+    priority: 0,
+    description: "The user restores its HP. The amount of HP restored varies depending on the weather.",
+  },
+  {
     name: "Thunderbolt",
     type: "Electric",
     category: "Special",
+    specialBehavior: "dmg-par",
     power: 90,
     accuracy: 100,
+    statusAccuracy: 10,
     pp: 15,
     priority: 0,
     description: "The user strikes with a bolt of lightning. This may also paralyze the target.",
     critChance: 0.0625  // Default crit rate
   },
   {
+    name: "Thunder Wave",
+    type: 'Electric',
+    category: "Status",
+    statusType: "par",
+    accuracy: 90,
+    pp: 20,
+    priority: 0,
+    description: "The user launches a weak jolt of electricity that paralyzes the target."
+  },
+  {
     name: "Toxic",
     type: "Poison",
     category: "Status",
     statusType: "psn",
-    accuracy: "90",
+    accuracy: 90,
     pp: 10,
     priority: 0,
     description: "The user shoots a toxic substance at the target, badly poisoning them.",
-
   },
   {
     name: "Toxic Surge",
@@ -372,6 +494,17 @@ const movesList = [
     priority: 0,
     description: "The user fights with overwhelming strength, lowering the user's Defense and Special Defense.",
   },
+  {
+    name: "X-Scissor",
+    type: "Bug",
+    category: "Physical",
+    power: 80,
+    accuracy: 100,
+    pp: 15,
+    priority: 0,
+    description: "The user slashes at the target by crossing its scythes, claws, or the like as if they were a pair of scissors.",
+    critChance: 0.0625
+  }
 ];
 
 export default movesList;
