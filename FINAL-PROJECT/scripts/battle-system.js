@@ -640,7 +640,7 @@ attackButton.addEventListener("click", function() {
     actionHolder.style.display = "None"
 });
 
-switchPokemonButton.addEventListener("click", OpenSwitchPokemon(true));
+switchPokemonButton.addEventListener("click", OpenSwitchPokemon);
 
 move1Button.addEventListener("click", function() {
     processTurn("move", yourActivePokemon.move1);
