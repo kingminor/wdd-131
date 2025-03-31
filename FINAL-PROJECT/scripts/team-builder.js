@@ -67,7 +67,9 @@ function UpdateStats(pokemon){
                                     <p>Sp. Defense: ${pokemon.spdef}</p>
                                     <p>Speed: ${pokemon.speed}</p>
                                 </div>
-                                <canvas id="pokemonRadarChart"></canvas>
+                                <div id="right-side">
+                                    <canvas id="pokemonRadarChart"></canvas>
+                                </div>
                             </div>`;
 
     const ctx = document.getElementById("pokemonRadarChart").getContext("2d");

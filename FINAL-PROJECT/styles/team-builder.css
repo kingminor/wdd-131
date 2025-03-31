@@ -93,8 +93,16 @@ main {
     background: darkred;
 }
 
-.stat-holder {
+#stat-holder {
     display: flex;
     flex-direction: row;
     width: 100%; /* Ensure stat-holder takes the full width */
+}
+
+#left-side{
+    width: 50%;
+}
+
+#right-side{
+    
 }
