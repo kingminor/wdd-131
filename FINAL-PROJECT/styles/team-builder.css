@@ -1,0 +1,100 @@
+body {
+    all: unset;
+}
+
+
+
+header{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    img{
+        max-width: 10%;
+    }
+
+    .link-holder{
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 2%;
+    }
+}
+
+main {
+    display: flex;
+    height: 70vh;
+
+    .available-pokemon-container {
+        width: 40%;
+        padding: 10px;
+    }
+
+    .pokemon-stat-holder{
+        width: 100%;
+        height: 100%;
+
+        #pokemon-info{
+            border: 2px solid black;
+            padding: 1%;
+            img {
+                height: 20vh;
+                image-rendering: pixelated;
+            }
+        }
+    }
+
+    .selected-pokemon-container {
+        width: 40%;
+        padding: 10px;
+    }
+    
+    .pokemon-list {
+        height: 100%;
+        overflow-y: auto;
+        border: 2px solid black;
+        padding: 10px;
+    }
+}
+
+.pokemon-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    margin: 5px;
+    background: lightgray;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.pokemon-item:hover {
+    background: gray;
+    color: white;
+}
+
+.pokemon-item img {
+    height: 50px;
+    image-rendering: pixelated;
+}
+
+.remove-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-btn:hover {
+    background: darkred;
+}
+
+.stat-holder {
+    display: flex;
+    flex-direction: row;
+    width: 100%; /* Ensure stat-holder takes the full width */
+}

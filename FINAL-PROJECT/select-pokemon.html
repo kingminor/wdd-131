@@ -3,15 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Pokemon</title>
-    <script src="scripts/pokemon-selector.js" type="module"></script>
+    <title>Pokémon Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .pokemon-container {
+            width: 50%;
+            padding: 10px;
+        }
+
+        .pokemon-list {
+            height: 80vh;
+            overflow-y: auto;
+            border: 2px solid black;
+            padding: 10px;
+        }
+
+        .pokemon-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px;
+            margin: 5px;
+            background: lightgray;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .pokemon-item:hover {
+            background: gray;
+            color: white;
+        }
+
+        .pokemon-item img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .remove-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .remove-btn:hover {
+            background: darkred;
+        }
+    </style>
 </head>
 <body>
-    <div id="body">
 
+    <!-- Available Pokémon List -->
+    <div class="pokemon-container">
+        <h2>Available Pokémon</h2>
+        <div class="pokemon-list" id="pokemonList"></div>
     </div>
-    <div id="selectedPokemon">
-        <!-- Selected Pokémon details will appear here -->
+
+    <!-- Selected Pokémon List -->
+    <div class="pokemon-container">
+        <h2>Selected Pokémon</h2>
+        <div class="pokemon-list" id="selectedList"></div>
     </div>
+
+    <!-- Pokémon Item Template -->
+    <template id="pokemonTemplate">
+        <div class="pokemon-item">
+            <img src="" alt="Pokemon Image">
+            <span class="pokemon-name"></span>
+        </div>
+    </template>
+
+    <!-- Selected Pokémon Template -->
+    <template id="selectedPokemonTemplate">
+        <div class="pokemon-item">
+            <img src="" alt="Pokemon Image">
+            <span class="pokemon-name"></span>
+            <button class="remove-btn">Remove</button>
+        </div>
+    </template>
+
+    <script>
+        const maxTeamSize = 6;
+        const pokemonArray = [
+            { name: "Pikachu", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" },
+            { name: "Charizard", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" },
+            { name: "Bulbasaur", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" },
+            { name: "Squirtle", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png" },
+            { name: "Jigglypuff", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png" },
+            { name: "Gengar", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png" },
+            { name: "Eevee", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png" },
+            { name: "Lucario", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png" },
+            { name: "Umbreon", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png" },
+            { name: "Gardevoir", img: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png" }
+        ];
+
+        const pokemonList = document.getElementById("pokemonList");
+        const selectedList = document.getElementById("selectedList");
+        const template = document.getElementById("pokemonTemplate");
+        const selectedTemplate = document.getElementById("selectedPokemonTemplate");
+
+        function createPokemonElement(pokemon) {
+            const clone = template.content.cloneNode(true);
+            const img = clone.querySelector("img");
+            const name = clone.querySelector(".pokemon-name");
+            const item = clone.querySelector(".pokemon-item");
+
+            img.src = pokemon.img;
+            img.alt = pokemon.name;
+            name.textContent = pokemon.name;
+
+            item.onclick = () => addPokemonToTeam(pokemon);
+
+            return clone;
+        }
+
+        function createSelectedPokemonElement(pokemon, index) {
+            const clone = selectedTemplate.content.cloneNode(true);
+            const img = clone.querySelector("img");
+            const name = clone.querySelector(".pokemon-name");
+            const removeBtn = clone.querySelector(".remove-btn");
+
+            img.src = pokemon ? pokemon.img : "https://via.placeholder.com/50";
+            img.alt = pokemon ? pokemon.name : "Empty Slot";
+            name.textContent = pokemon ? pokemon.name : "Empty Slot";
+
+            if (pokemon) {
+                removeBtn.onclick = () => removePokemonFromTeam(index);
+            } else {
+                removeBtn.style.display = "none"; // Hide remove button for empty slots
+            }
+
+            return clone;
+        }
+
+        function addPokemonToTeam(pokemon) {
+            const currentTeam = Array.from(selectedList.children).filter(el => el.dataset.name);
+
+            if (currentTeam.length >= maxTeamSize) return; // Limit to 6 Pokémon
+
+            let emptySlot = -1;
+            for (let i = 0; i < maxTeamSize; i++) {
+                if (!selectedList.children[i].dataset.name) {
+                    emptySlot = i;
+                    break;
+                }
+            }
+
+            if (emptySlot !== -1) {
+                selectedList.children[emptySlot].replaceWith(createSelectedPokemonElement(pokemon, emptySlot));
+                selectedList.children[emptySlot].dataset.name = pokemon.name;
+            }
+        }
+
+        function removePokemonFromTeam(index) {
+            selectedList.children[index].replaceWith(createSelectedPokemonElement(null, index));
+            selectedList.children[index].removeAttribute("data-name");
+        }
+
+        // Initialize the available Pokémon list
+        pokemonArray.forEach(pokemon => {
+            pokemonList.appendChild(createPokemonElement(pokemon));
+        });
+
+        // Initialize selected Pokémon team with 6 empty slots
+        for (let i = 0; i < maxTeamSize; i++) {
+            selectedList.appendChild(createSelectedPokemonElement(null, i));
+        }
+    </script>
+
 </body>
 </html>

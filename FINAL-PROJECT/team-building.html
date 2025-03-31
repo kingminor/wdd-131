@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Pokemon</title>
+    <link rel="stylesheet" href="styles/team-builder.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/team-builder.js" type="module"></script>
+</head>
+<body>
+    <header>
+        <img src="images/logo.jpg">
+        <div class="link-holder">
+            <a href="#">Home</a>
+            <a href="#">Battle</a>
+        </div>
+    </header>
+    <main>
+        <div class="available-pokemon-container">
+            <h2>Available Pokémon</h2>
+            <div class="pokemon-list" id="pokemonList"></div>
+        </div>
+        <div class="pokemon-stat-holder">
+            <h2>Pokemon Stats</h2>
+            <div id="pokemon-info">
+            </div>
+        </div>
+        <div class="selected-pokemon-container">
+            <h2>Selected Pokémon</h2>
+            <div class="pokemon-list" id="selectedList"></div>
+        </div>
+    </main>
+</body>
+</html>
