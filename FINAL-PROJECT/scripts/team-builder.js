@@ -104,55 +104,57 @@ function UpdateStats(pokemon){
                                     <p>Speed: ${pokemon.speed}</p>
                                 </div>
                                 <div id="right-side">
-                                    <canvas id="pokemonRadarChart"></canvas>
+                                    
                                 </div>
                             </div>`;
 
-    const ctx = document.getElementById("pokemonRadarChart").getContext("2d");
+                            //canvas <canvas id="pokemonRadarChart"></canvas>
+
+    //const ctx = document.getElementById("pokemonRadarChart").getContext("2d");
     
     // Destroy the existing chart (if any) before creating a new one
-    if (radarChart) {
-        radarChart.destroy();
-    }
+    // if (radarChart) {
+    //     radarChart.destroy();
+    // }
 
-    const stats = [
-        pokemon.hp, 
-        pokemon.spattack, 
-        pokemon.spdef, 
-        pokemon.speed, 
-        pokemon.defense, 
-        pokemon.attack
-    ];
+    // const stats = [
+    //     pokemon.hp, 
+    //     pokemon.spattack, 
+    //     pokemon.spdef, 
+    //     pokemon.speed, 
+    //     pokemon.defense, 
+    //     pokemon.attack
+    // ];
 
-    // Create the radar chart
-    radarChart = new Chart(ctx, {
-        type: 'radar',
-        data: {
-            labels: statLabels,
-            datasets: [{
-                label: pokemon.name,
-                data: stats,
-                backgroundColor: 'rgba(0, 206, 86, 0.2)',
-                borderColor: 'rgba(0, 206, 86, 1)',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    suggestedMax: 100
-                }
-            }
-        }
-    });
+    // // Create the radar chart
+    // radarChart = new Chart(ctx, {
+    //     type: 'radar',
+    //     data: {
+    //         labels: statLabels,
+    //         datasets: [{
+    //             label: pokemon.name,
+    //             data: stats,
+    //             backgroundColor: 'rgba(0, 206, 86, 0.2)',
+    //             borderColor: 'rgba(0, 206, 86, 1)',
+    //             borderWidth: 2
+    //         }]
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         scales: {
+    //             r: {
+    //                 beginAtZero: true,
+    //                 suggestedMax: 100
+    //             }
+    //         }
+    //     }
+    // });
 
-    const pokemonRadarChart = document.getElementById("pokemonRadarChart");
-    pokemonRadarChart.width = 10; // Set width as a number
-    pokemonRadarChart.height = 10; // Set height as a number
+    // const pokemonRadarChart = document.getElementById("pokemonRadarChart");
+    // pokemonRadarChart.width = 10; // Set width as a number
+    // pokemonRadarChart.height = 10; // Set height as a number
 
-    radarChart.update(); // Use update() instead of Update()
+    // radarChart.update(); // Use update() instead of Update()
 }
 
 // INIT

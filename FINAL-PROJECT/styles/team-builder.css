@@ -19,8 +19,11 @@ header{
     display: flex;
     align-items: center;
     width: 100%;
+    height: 100px;
+    background-color: #000721;
     img{
-        max-width: 100px;
+        width: 100px;
+        height: 100px;
     }
 
     .link-holder{
@@ -28,12 +31,25 @@ header{
         height: inherit;
         display: flex;
         justify-content: flex-end;
-        align-items: flex-end;
+        align-items: stretch;
+        gap: 10px;
 
-        a {
+        button {
             all:unset;
             color: var(--accent2-color);
-            background-color: #004BA8;
+            align-items: center;
+            justify-content: center;
+            height: 100%; /* Makes the buttons take full height */
+            padding: 0 40px;
+            height: inherit;
+            text-align: center;
+            font-family: 'Jersey 20', 'Roboto';
+            font-size: xx-large;
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            cursor: pointer;
         }
     }
 }
@@ -49,13 +65,14 @@ main {
     }
 
     .pokemon-stat-holder{
-        width: 100%;
+        max-width: 100%;
+        width: 500px;
         height: 100%;
 
         #pokemon-info{
             height: 100%;
             border: 2px solid var(--accent2-color);
-            padding: 1%;
+            padding: 3%;
             img {
                 height: 20vh;
                 padding-left: 10%;
@@ -129,17 +146,23 @@ main {
     width: 50%;
 }
 
-#right-side{
-    
-}
+/* #right-side{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent2-color);
+    border: #DADAD9 2px solid;
+    border-radius: 20px;
+} */
 
 #StartGame {
     font-family: 'Jersey 20', 'Roboto';
     width: 100%;
     height: 20%;
-    margin: auto;
+    margin-top: 10px;
     font-size: 50px;
 }
 
-@media screen and (min-width: 1000px) {
+@media screen and (min-width: 900px) {
 }

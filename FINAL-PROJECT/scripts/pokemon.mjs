@@ -187,6 +187,7 @@ const Pokemon = [
       backSprite: "images/poke/umbreon/umbreon-back.gif",
       moves: [
           //"Foul Play",
+          "Crunch",
           "Dark Pulse",
           "Payback",
           "Confuse Ray",
