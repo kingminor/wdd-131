@@ -4,6 +4,7 @@ const pokemonList = document.getElementById("pokemonList");
 const selectedList = document.getElementById("selectedList");
 const pokemonStats = document.getElementById("pokemon-info");
 let radarChart; // Declare radarChart globally
+const startGameButton = document.getElementById("StartGame");
 
 const statLabels = ['HP', 'Sp. Attack', 'Sp. Defense', 'Speed', 'Defense', 'Attack'];
 
@@ -35,12 +36,31 @@ function selectedPokemonTemplate(pokemon) {
     `;
 
     div.querySelector(".remove-btn").addEventListener("click", () => {
+        // Get the stored Pokémon list
+        let selectedPokemonArray = JSON.parse(sessionStorage.getItem("selectedPokemonList")) || [];
+        
+        // Ensure filtering removes only one occurrence, not all
+        let indexToRemove = selectedPokemonArray.findIndex(p => p.name === pokemon.name);
+        if (indexToRemove !== -1) {
+            selectedPokemonArray.splice(indexToRemove, 1); // Remove only the first match
+        }
+        
+        // Update sessionStorage with the modified array
+        sessionStorage.setItem("selectedPokemonList", JSON.stringify(selectedPokemonArray));
+    
+        // Remove from UI
         div.remove();
     });
+    
 
     div.addEventListener("mouseover", () => UpdateStats(pokemon));
 
     return div;
+}
+
+function getRandomMoves(moves, count = 4) {
+    let shuffled = [...moves].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
 }
 
 function addToSelectedPokemon(pokemon) {
@@ -51,6 +71,22 @@ function addToSelectedPokemon(pokemon) {
     }
     
     selectedList.appendChild(selectedPokemonTemplate(pokemon));
+
+    let randomMoves = getRandomMoves(pokemon.moves);
+
+    let selectedPokemon = {
+        name: pokemon.name,
+        move1: randomMoves[0],
+        move2: randomMoves[1],
+        move3: randomMoves[2],
+        move4: randomMoves[3],
+    }
+
+    let selectedPokemonArray = JSON.parse(sessionStorage.getItem("selectedPokemonList")) || [];
+    selectedPokemonArray.push(selectedPokemon);
+    sessionStorage.setItem("selectedPokemonList", JSON.stringify(selectedPokemonArray));
+    console.log(selectedPokemonArray);
+
 }
 
 function UpdateStats(pokemon){
@@ -119,7 +155,8 @@ function UpdateStats(pokemon){
     radarChart.update(); // Use update() instead of Update()
 }
 
-// Populate Pokémon list
+// INIT
+sessionStorage.setItem("selectedPokemonList", null);
 pokemonList.innerHTML = ""; // Clear existing content
 Pokemon.forEach(pokemon => {
     pokemonList.appendChild(PokemonTemplate(pokemon));
@@ -127,4 +164,8 @@ Pokemon.forEach(pokemon => {
 
 document.addEventListener("DOMContentLoaded", () => {
     UpdateStats(getRandomElement(Pokemon)); // Initialize with a random Pokémon
+});
+
+startGameButton.addEventListener("click", function() {
+    window.location.href = "battleing.html";
 });

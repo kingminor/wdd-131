@@ -626,7 +626,14 @@ function init(yourTeam, opponentsTeam) {
     move4Button.innerText = `${yourActivePokemon.move4.name}`;
 }
 
-GenerateTeamFromPokemon(yourPokemonTeam, testTeam1)
+let selectedPokemonArray = JSON.parse(sessionStorage.getItem("selectedPokemonList"));
+console.log(selectedPokemonArray);
+
+if(selectedPokemonArray != null){
+    GenerateTeamFromPokemon(yourPokemonTeam, selectedPokemonArray);
+} else {
+    GenerateTeamFromPokemon(yourPokemonTeam, testTeam1);
+}
 
 GenerateTeamFromPokemon(opponentsPokemonTeam, testTeam2)
 
