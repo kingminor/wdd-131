@@ -60,7 +60,7 @@ const movesList = [
   },
   {
     name: "Confuse Ray",
-    type: "Ghose",
+    type: "Ghost",
     category: "Status",
     statusType: "con",
     accuracy: 100,
