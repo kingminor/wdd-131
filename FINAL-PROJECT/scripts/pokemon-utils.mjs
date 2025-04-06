@@ -193,6 +193,29 @@ const testTeam2 = [
     },
 ]
 
+function getRandomMoves(moveList, count = 4) {
+    const shuffled = [...moveList].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+}
+
+function generateRandomTeam(pokemonList) {
+    const shuffledPokemon = [...pokemonList].sort(() => 0.5 - Math.random());
+    const selectedTeam = shuffledPokemon.slice(0, 6);
+
+    const team = selectedTeam.map(poke => {
+        const moves = getRandomMoves(poke.moves);
+        return {
+            name: poke.name,
+            move1: moves[0],
+            move2: moves[1],
+            move3: moves[2],
+            move4: moves[3]
+        };
+    });
+
+    return team;
+}
+
 function getSTAB(inputType, typeArray) {
     inputType = inputType.toLowerCase(); // Convert query to lowercase for case-insensitive search
     return typeArray.some(item => item.toLowerCase() === inputType);
@@ -381,4 +404,4 @@ async function doesHitAdvanced(user, target, move) {
     }
 }
 
-export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced };
+export { calculateHealth, determineGender, getPokemonByName, GenerateTeamFromPokemon, testTeam1, testTeam2, generateRandomTeam, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced };

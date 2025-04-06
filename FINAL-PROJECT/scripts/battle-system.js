@@ -1,7 +1,7 @@
 import Pokemon from "./pokemon.mjs";
 import movesList from "./moves.mjs";
 import { getTypeEffectiveness, GetTypeImageSourceFromString, generateTypeIcons } from "./typeChart.mjs"
-import {GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced } from "./pokemon-utils.mjs";
+import {generateRandomTeam, GenerateTeamFromPokemon, testTeam1, testTeam2, getSTAB, calculateDamage, attackPokemon, HealPokemon, DrainPokemon, doesSucceed, doesHitWithStats, doesHitAdvanced } from "./pokemon-utils.mjs";
 import {typeText, UpdateHealthBar, UpdateNameTags} from "./ui-utils.mjs";
 
 const yourPokemonSprite = document.getElementById("your-pokemon-sprite");
@@ -635,7 +635,7 @@ if(selectedPokemonArray != null){
     GenerateTeamFromPokemon(yourPokemonTeam, testTeam1);
 }
 
-GenerateTeamFromPokemon(opponentsPokemonTeam, testTeam2)
+GenerateTeamFromPokemon(opponentsPokemonTeam, generateRandomTeam(Pokemon))
 
 init(yourPokemonTeam, opponentsPokemonTeam);
 
